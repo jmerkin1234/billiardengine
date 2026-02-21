@@ -79,6 +79,21 @@ dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/S
 dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark 120 --profile debug240 --perf-budget-ms 6
 ```
 
+Run benchmark matrix and write markdown report:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark-matrix 120 --perf-budget-ms 6
+```
+
+Default report output:
+- `/home/justin/Pictures/billiardengine/engine-rewrite/docs/BENCHMARK_MATRIX.md`
+
+Optional custom report path:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark-matrix 120 --benchmark-report /absolute/path/report.md
+```
+
 Profile presets:
 - `physics` (default): 480Hz, highest fidelity.
 - `balanced`: 360Hz, moderate fallback.

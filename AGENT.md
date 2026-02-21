@@ -19,6 +19,7 @@ Working log for ongoing Codex changes in this repository.
   - added iterative residual penetration solver
   - exposed extra stabilization tuning in `PhysicsProfile`
   - added benchmark profile presets + perf warning thresholds in runner
+  - added benchmark matrix runner that writes markdown report tables
 - Validation status:
   - `dotnet build` passes
   - `--sanity` passes (head-on transfer, overlap recovery, rail bounce, pocket event emission, shot lifecycle events, prediction isolation)
@@ -26,6 +27,7 @@ Working log for ongoing Codex changes in this repository.
   - `--stress 1000 --seed 1337` passes
   - baseline suite passes `10/10` against current fixture
   - `--benchmark` reports avg/p50/p95/p99/worst plus sim-step throughput and budget warnings
+  - `--benchmark-matrix` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/BENCHMARK_MATRIX.md`
 
 ## Next Work Queue
 - Improve physical realism against external references (beyond self-baseline parity).
@@ -38,3 +40,4 @@ Working log for ongoing Codex changes in this repository.
   - completed collision stability pass and re-baselined fixture suite
   - expanded sanity-mode checks with pocket events, shot lifecycle events, and prediction isolation checks
   - added benchmark profile presets (`physics`, `balanced`, `debug240`) and non-default baseline guard (`--force-baseline`)
+  - added benchmark matrix command (`--benchmark-matrix`) and markdown report output path (`--benchmark-report`)

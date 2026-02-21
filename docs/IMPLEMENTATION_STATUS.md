@@ -38,6 +38,7 @@ Date: 2026-02-21
   - deterministic rerun checks (`--determinism`)
   - randomized stress invariants (`--stress`)
   - benchmark breakdown + perf warnings (`--benchmark`, `--profile`, `--perf-budget-ms`)
+  - benchmark matrix markdown report (`--benchmark-matrix`, optional `--benchmark-report`)
   - non-default profile baseline guard (skips fixture compare unless `--force-baseline`)
 - Stability fixes:
   - corrected ball-ball normal-velocity sign handling in impulse resolution
@@ -51,6 +52,7 @@ Date: 2026-02-21
 - Determinism check passes across repeated runs.
 - Stress check passes at 1000 randomized shots (seed 1337).
 - Benchmark profile presets execute with detailed throughput metrics and warning thresholds.
+- Benchmark matrix runner writes a docs report table at `docs/BENCHMARK_MATRIX.md`.
 
 ## Deferred (Post-V1)
 

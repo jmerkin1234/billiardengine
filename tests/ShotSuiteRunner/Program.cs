@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using BilliardsPhysicsEngine;
 using BilliardsPhysicsEngine.Config;
@@ -78,7 +79,14 @@ if (options.StressShots > 0)
 
 if (options.BenchmarkShots > 0)
 {
-    RunBenchmarkMode(engine, rack, profile, options.BenchmarkShots, options.RandomSeed, options.PerfBudgetMs);
+    _ = RunBenchmarkMode(engine, rack, profile, options.BenchmarkShots, options.RandomSeed, options.PerfBudgetMs);
+}
+
+if (options.BenchmarkMatrixShots > 0)
+{
+    string reportPath = ResolveBenchmarkReportPath(options.BenchmarkReportPath);
+    int code = RunBenchmarkMatrix(options.BenchmarkMatrixShots, options.RandomSeed, options.PerfBudgetMs, reportPath);
+    Environment.Exit(code);
 }
 
 if (!options.ForceBaseline && normalizedProfilePreset != "physics")
@@ -297,7 +305,7 @@ static int RunStressMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsP
     return 0;
 }
 
-static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, int shots, int seed, double perfBudgetMs)
+static BenchmarkResult RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, int shots, int seed, double perfBudgetMs)
 {
     string budgetLabel = perfBudgetMs > 0.0
         ? $"{perfBudgetMs.ToString("F2", CultureInfo.InvariantCulture)}ms/shot"
@@ -362,7 +370,7 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
     if (completedShots == 0)
     {
         Console.WriteLine("Benchmark: no completed shots");
-        return;
+        return BenchmarkResult.Empty(profile.SimulationHz, shots, perfBudgetMs);
     }
 
     shotTimesMs.Sort();
@@ -379,6 +387,7 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
     Console.WriteLine($"Benchmark Breakdown: completed={completedShots}/{shots} rejected={rejectedShots} avgSteps={avgSteps:F1} avgSim={avgSimSeconds:F3}s");
     Console.WriteLine($"Benchmark Throughput: msPerSimSecond={msPerSimSecond:F3} realtimeFactor={realTimeFactor:F2}x");
 
+    int perfWarnCount = 0;
     if (perfBudgetMs > 0.0)
     {
         bool warn = false;
@@ -386,18 +395,21 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
         {
             Console.WriteLine($"WARN perf: avg shot time {avgMs:F3}ms exceeds budget {perfBudgetMs:F3}ms");
             warn = true;
+            perfWarnCount++;
         }
 
         if (p95Ms > perfBudgetMs * 1.25)
         {
             Console.WriteLine($"WARN perf: p95 shot time {p95Ms:F3}ms exceeds 125% budget");
             warn = true;
+            perfWarnCount++;
         }
 
         if (worstMs > perfBudgetMs * 2.0)
         {
             Console.WriteLine($"WARN perf: worst shot time {worstMs:F3}ms exceeds 200% budget");
             warn = true;
+            perfWarnCount++;
         }
 
         if (!warn)
@@ -409,6 +421,108 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
             Console.WriteLine("Hint: try `--profile balanced` or `--profile debug240` for manual perf preset fallback.");
         }
     }
+
+    return new BenchmarkResult(
+        profile.SimulationHz,
+        shots,
+        completedShots,
+        rejectedShots,
+        avgMs,
+        p50Ms,
+        p95Ms,
+        p99Ms,
+        worstMs,
+        avgSteps,
+        avgSimSeconds,
+        msPerSimSecond,
+        realTimeFactor,
+        perfBudgetMs,
+        perfWarnCount);
+}
+
+static int RunBenchmarkMatrix(int shots, int seed, double perfBudgetMs, string reportPath)
+{
+    Console.WriteLine($"Benchmark Matrix: shots={shots}, seed={seed}");
+
+    string[] presets = { "physics", "balanced", "debug240" };
+    List<(string Preset, BenchmarkResult Result)> rows = new(presets.Length);
+    List<int> objectIds = Enumerable.Range(1, 15).ToList();
+
+    for (int i = 0; i < presets.Length; i++)
+    {
+        string preset = presets[i];
+        Console.WriteLine($"--- preset: {preset} ---");
+        PhysicsProfile profile = new();
+        ApplyProfilePreset(profile, preset);
+        BilliardPhysicsEngine engine = new();
+        TableGeometry table = engine.CreateEightFootTable(0.0);
+        RackPreset rack = RackPreset.EightBall(table, profile.BallRadius, profile.BallMass, 0, objectIds);
+        engine.Initialize(table, profile, rack.InitialStates);
+
+        BenchmarkResult result = RunBenchmarkMode(engine, rack, profile, shots, seed, perfBudgetMs);
+        if (result.CompletedShots == 0)
+        {
+            Console.WriteLine($"FAIL benchmark-matrix: preset '{preset}' produced zero completed shots");
+            return 1;
+        }
+
+        rows.Add((preset, result));
+    }
+
+    WriteBenchmarkMatrixReport(rows, shots, seed, perfBudgetMs, reportPath);
+    Console.WriteLine($"Benchmark matrix report written to {reportPath}");
+    return 0;
+}
+
+static void WriteBenchmarkMatrixReport(IReadOnlyList<(string Preset, BenchmarkResult Result)> rows, int shots, int seed, double perfBudgetMs, string reportPath)
+{
+    StringBuilder md = new();
+    string budgetLabel = perfBudgetMs > 0.0
+        ? $"{perfBudgetMs.ToString("F2", CultureInfo.InvariantCulture)} ms/shot"
+        : "off";
+
+    md.AppendLine("# Benchmark Matrix Report");
+    md.AppendLine();
+    md.AppendLine($"- Generated (UTC): `{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)} UTC`");
+    md.AppendLine($"- Shots per preset: `{shots}`");
+    md.AppendLine($"- Seed: `{seed}`");
+    md.AppendLine($"- Perf budget: `{budgetLabel}`");
+    md.AppendLine();
+    md.AppendLine("| Preset | Hz | Completed | Avg ms | P95 ms | Worst ms | Avg steps | Avg sim (s) | ms/sim-s | RT factor | Budget |");
+    md.AppendLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|");
+
+    for (int i = 0; i < rows.Count; i++)
+    {
+        (string preset, BenchmarkResult result) = rows[i];
+        string budgetStatus = perfBudgetMs <= 0.0
+            ? "n/a"
+            : (result.PerfWarnCount == 0 ? "pass" : $"warn ({result.PerfWarnCount})");
+
+        md.AppendLine(
+            $"| `{preset}` | {result.SimulationHz} | {result.CompletedShots}/{result.RequestedShots} | " +
+            $"{result.AvgMs.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{result.P95Ms.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{result.WorstMs.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{result.AvgSteps.ToString("F1", CultureInfo.InvariantCulture)} | " +
+            $"{result.AvgSimSeconds.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{result.MsPerSimSecond.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{result.RealTimeFactor.ToString("F2", CultureInfo.InvariantCulture)}x | {budgetStatus} |");
+    }
+
+    md.AppendLine();
+    md.AppendLine("## Notes");
+    md.AppendLine("- `physics` is the default high-fidelity profile.");
+    md.AppendLine("- `balanced` and `debug240` are manual fallback presets.");
+    md.AppendLine("- No automatic fidelity downshift is applied by the engine.");
+
+    string fullPath = Path.GetFullPath(reportPath);
+    string? dir = Path.GetDirectoryName(fullPath);
+    if (!string.IsNullOrWhiteSpace(dir))
+    {
+        Directory.CreateDirectory(dir);
+    }
+
+    File.WriteAllText(fullPath, md.ToString());
 }
 
 static void ApplyProfilePreset(PhysicsProfile profile, string preset)
@@ -1149,6 +1263,49 @@ static string ResolveFixturePath(string? argPath)
     return Path.Combine(AppContext.BaseDirectory, "fixtures", "shot_suite_baseline.json");
 }
 
+static string ResolveBenchmarkReportPath(string? argPath)
+{
+    if (!string.IsNullOrWhiteSpace(argPath))
+    {
+        return Path.GetFullPath(argPath);
+    }
+
+    string? repoRoot = TryFindRepositoryRoot();
+    if (!string.IsNullOrWhiteSpace(repoRoot))
+    {
+        return Path.Combine(repoRoot, "docs", "BENCHMARK_MATRIX.md");
+    }
+
+    return Path.Combine(Environment.CurrentDirectory, "BENCHMARK_MATRIX.md");
+}
+
+static string? TryFindRepositoryRoot()
+{
+    string[] startPaths = { Environment.CurrentDirectory, AppContext.BaseDirectory };
+
+    for (int i = 0; i < startPaths.Length; i++)
+    {
+        DirectoryInfo? dir = new DirectoryInfo(startPaths[i]);
+        while (dir is not null)
+        {
+            bool hasRepoMarkers =
+                File.Exists(Path.Combine(dir.FullName, "README.md")) &&
+                Directory.Exists(Path.Combine(dir.FullName, "docs")) &&
+                Directory.Exists(Path.Combine(dir.FullName, "src")) &&
+                Directory.Exists(Path.Combine(dir.FullName, "tests"));
+
+            if (hasRepoMarkers)
+            {
+                return dir.FullName;
+            }
+
+            dir = dir.Parent;
+        }
+    }
+
+    return null;
+}
+
 static double NormalizeDeltaAngle(double a, double b)
 {
     double delta = (a - b) % 360.0;
@@ -1205,6 +1362,62 @@ internal readonly struct SimResult
         => new(false, error, PhysVector3.Zero, 0.0, 0.0, false, 0, 0, SimulationFrame.Empty);
 }
 
+internal readonly struct BenchmarkResult
+{
+    public int SimulationHz { get; }
+    public int RequestedShots { get; }
+    public int CompletedShots { get; }
+    public int RejectedShots { get; }
+    public double AvgMs { get; }
+    public double P50Ms { get; }
+    public double P95Ms { get; }
+    public double P99Ms { get; }
+    public double WorstMs { get; }
+    public double AvgSteps { get; }
+    public double AvgSimSeconds { get; }
+    public double MsPerSimSecond { get; }
+    public double RealTimeFactor { get; }
+    public double PerfBudgetMs { get; }
+    public int PerfWarnCount { get; }
+
+    public BenchmarkResult(
+        int simulationHz,
+        int requestedShots,
+        int completedShots,
+        int rejectedShots,
+        double avgMs,
+        double p50Ms,
+        double p95Ms,
+        double p99Ms,
+        double worstMs,
+        double avgSteps,
+        double avgSimSeconds,
+        double msPerSimSecond,
+        double realTimeFactor,
+        double perfBudgetMs,
+        int perfWarnCount)
+    {
+        SimulationHz = simulationHz;
+        RequestedShots = requestedShots;
+        CompletedShots = completedShots;
+        RejectedShots = rejectedShots;
+        AvgMs = avgMs;
+        P50Ms = p50Ms;
+        P95Ms = p95Ms;
+        P99Ms = p99Ms;
+        WorstMs = worstMs;
+        AvgSteps = avgSteps;
+        AvgSimSeconds = avgSimSeconds;
+        MsPerSimSecond = msPerSimSecond;
+        RealTimeFactor = realTimeFactor;
+        PerfBudgetMs = perfBudgetMs;
+        PerfWarnCount = perfWarnCount;
+    }
+
+    public static BenchmarkResult Empty(int simulationHz, int requestedShots, double perfBudgetMs)
+        => new(simulationHz, requestedShots, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, perfBudgetMs, 0);
+}
+
 internal sealed class RunnerOptions
 {
     public bool RecordMode { get; private set; }
@@ -1213,11 +1426,13 @@ internal sealed class RunnerOptions
     public int DeterminismRepeats { get; private set; }
     public int StressShots { get; private set; }
     public int BenchmarkShots { get; private set; }
+    public int BenchmarkMatrixShots { get; private set; }
     public int RandomSeed { get; private set; } = 1337;
     public string ProfilePreset { get; private set; } = "physics";
     public double PerfBudgetMs { get; private set; }
     public bool ForceBaseline { get; private set; }
     public string? FixturePath { get; private set; }
+    public string? BenchmarkReportPath { get; private set; }
 
     public static RunnerOptions Parse(string[] args)
     {
@@ -1252,6 +1467,10 @@ internal sealed class RunnerOptions
                     options.BenchmarkShots = ReadIntArg(args, ref i, 200, minValue: 1);
                     break;
 
+                case "--benchmark-matrix":
+                    options.BenchmarkMatrixShots = ReadIntArg(args, ref i, 120, minValue: 1);
+                    break;
+
                 case "--seed":
                     options.RandomSeed = ReadIntArg(args, ref i, options.RandomSeed, minValue: int.MinValue);
                     break;
@@ -1266,6 +1485,13 @@ internal sealed class RunnerOptions
 
                 case "--force-baseline":
                     options.ForceBaseline = true;
+                    break;
+
+                case "--benchmark-report":
+                    if (i + 1 < args.Length)
+                    {
+                        options.BenchmarkReportPath = args[++i];
+                    }
                     break;
 
                 case "--fixtures":
