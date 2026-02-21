@@ -1,0 +1,282 @@
+[
+  {
+    "Name": "Straight stop shot",
+    "ShotBallId": 0,
+    "TrackBallId": 0,
+    "AimDirection": [
+      0,
+      0,
+      -1
+    ],
+    "Impulse": 0.55,
+    "TipOffset": [
+      0,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0,
+      -0.15,
+      1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Follow shot",
+    "ShotBallId": 0,
+    "TrackBallId": 0,
+    "AimDirection": [
+      0,
+      0,
+      -1
+    ],
+    "Impulse": 0.65,
+    "TipOffset": [
+      0,
+      0.012
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0,
+      -0.15,
+      1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Draw shot",
+    "ShotBallId": 0,
+    "TrackBallId": 0,
+    "AimDirection": [
+      0,
+      0,
+      -1
+    ],
+    "Impulse": 0.65,
+    "TipOffset": [
+      0,
+      -0.012
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      -0.5588,
+      -0.15,
+      1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Cut shot with throw",
+    "ShotBallId": 0,
+    "TrackBallId": 1,
+    "AimDirection": [
+      0.23,
+      0,
+      -0.97
+    ],
+    "Impulse": 0.7,
+    "TipOffset": [
+      0.006,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0,
+      0.028575,
+      -0.5588
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Running english rail rebound",
+    "ShotBallId": 0,
+    "TrackBallId": 0,
+    "AimDirection": [
+      0.66,
+      0,
+      -0.75
+    ],
+    "Impulse": 0.65,
+    "TipOffset": [
+      0.01,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0.08664751773110327,
+      0.028575,
+      1.0706522529791003
+    ],
+    "ExpectedExitAngleDeg": 124.49043758470364,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Reverse english rail rebound",
+    "ShotBallId": 0,
+    "TrackBallId": 0,
+    "AimDirection": [
+      0.66,
+      0,
+      -0.75
+    ],
+    "Impulse": 0.65,
+    "TipOffset": [
+      -0.01,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0,
+      -0.15,
+      1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Jaw rattle then pocket",
+    "ShotBallId": 0,
+    "TrackBallId": 1,
+    "AimDirection": [
+      -0.72,
+      0,
+      -0.69
+    ],
+    "Impulse": 0.75,
+    "TipOffset": [
+      0,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0.5588,
+      -0.15,
+      -1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Jaw reject",
+    "ShotBallId": 0,
+    "TrackBallId": 1,
+    "AimDirection": [
+      0.72,
+      0,
+      -0.69
+    ],
+    "Impulse": 0.95,
+    "TipOffset": [
+      0,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      -0.5588,
+      -0.15,
+      -1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Medium break stability",
+    "ShotBallId": 0,
+    "TrackBallId": 0,
+    "AimDirection": [
+      0,
+      0,
+      -1
+    ],
+    "Impulse": 1,
+    "TipOffset": [
+      0,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      0.5291042195436921,
+      0.028575,
+      0.8921129227102228
+    ],
+    "ExpectedExitAngleDeg": -6.005276755317596,
+    "ExpectedSettleSeconds": 8.00208333333304
+  },
+  {
+    "Name": "Frozen-ball contact stability",
+    "ShotBallId": 0,
+    "TrackBallId": 1,
+    "AimDirection": [
+      0,
+      0,
+      -1
+    ],
+    "Impulse": 0.48,
+    "TipOffset": [
+      0,
+      0
+    ],
+    "CueElevationDeg": 0,
+    "CueMass": 0.525,
+    "TipRadius": 0.006,
+    "SpinMultiplier": 18,
+    "HorizonSeconds": 8,
+    "RequireRestByHorizon": false,
+    "ExpectedFinalPosition": [
+      -0.5588,
+      -0.15,
+      -1.1176
+    ],
+    "ExpectedExitAngleDeg": 0,
+    "ExpectedSettleSeconds": 8.00208333333304
+  }
+]

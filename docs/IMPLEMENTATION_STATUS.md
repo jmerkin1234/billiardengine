@@ -1,0 +1,52 @@
+# Implementation Status
+
+Date: 2026-02-21
+
+## Completed
+
+- Engine core created in a new location:
+  - `/home/justin/Pictures/billiardengine/engine-rewrite/src/BilliardsPhysicsEngine`
+- Implemented public contracts:
+  - `BallState`, `BallInitState`, `CueShotInput`, `TableGeometry`, `PocketGeometry`, `SimulationFrame`, `PhysicsEvent`, `RackPreset`, `PredictionSettings`
+- Implemented canonical tuning source:
+  - `PhysicsProfile` class (single source of truth)
+- Implemented fixed-step engine:
+  - `BilliardsPhysicsWorld` with 240-500Hz-compatible stepping (default 480)
+  - ball-ball CCD (quadratic TOI)
+  - normal + tangential impulse collision response
+  - sliding->rolling cloth model and spin decay
+  - cushion rebound with english influence
+  - pocket mouth/jaw/drop logic
+  - rest detection + `AllBallsStopped` event
+- Implemented prediction:
+  - shot trajectory prediction and first-contact tracking
+- Implemented Unity adapters (drop-in scripts):
+  - runtime controller
+  - cue strike adapter
+  - compatibility shims
+  - training/ghost-path helpers
+- Implemented validation harness:
+  - `tests/ShotSuiteRunner`
+  - 10-case shot suite fixture and baseline recorder
+  - standalone sanity checks (`--sanity`)
+  - deterministic rerun checks (`--determinism`)
+  - randomized stress invariants (`--stress`)
+- Stability fixes:
+  - corrected ball-ball normal-velocity sign handling in impulse resolution
+  - added iterative post-collision penetration stabilization pass
+
+## Verified
+
+- `dotnet build` succeeds for core and test projects.
+- Shot suite runner executes and passes against recorded baseline fixture.
+- Sanity checks pass without Unity scene/model dependencies.
+- Determinism check passes across repeated runs.
+- Stress check passes at 1000 randomized shots (seed 1337).
+
+## Deferred (Post-V1)
+
+- Jump shots
+- Massé
+- Squirt/deflection
+- Miscues
+- Cross-platform lockstep determinism
