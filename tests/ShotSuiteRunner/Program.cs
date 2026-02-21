@@ -11,6 +11,7 @@ const double MaxSettleErrorSeconds = 0.25;
 const double DeterminismEpsilon = 1e-10;
 
 RunnerOptions options = RunnerOptions.Parse(args);
+string normalizedProfilePreset = NormalizeProfilePreset(options.ProfilePreset);
 string fixturesPath = ResolveFixturePath(options.FixturePath);
 
 if (!File.Exists(fixturesPath))
@@ -31,6 +32,7 @@ if (fixtures.Length == 0)
 }
 
 PhysicsProfile profile = new();
+ApplyProfilePreset(profile, normalizedProfilePreset);
 BilliardPhysicsEngine engine = new();
 TableGeometry table = engine.CreateEightFootTable(0.0);
 
@@ -76,7 +78,13 @@ if (options.StressShots > 0)
 
 if (options.BenchmarkShots > 0)
 {
-    RunBenchmarkMode(engine, rack, profile, options.BenchmarkShots, options.RandomSeed);
+    RunBenchmarkMode(engine, rack, profile, options.BenchmarkShots, options.RandomSeed, options.PerfBudgetMs);
+}
+
+if (!options.ForceBaseline && normalizedProfilePreset != "physics")
+{
+    Console.WriteLine($"INFO baseline comparison skipped for non-default profile preset '{normalizedProfilePreset}'. Use --force-baseline to run anyway.");
+    Environment.Exit(0);
 }
 
 int failed = RunBaselineComparison(engine, rack, profile, fixtures);
@@ -289,15 +297,23 @@ static int RunStressMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsP
     return 0;
 }
 
-static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, int shots, int seed)
+static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, int shots, int seed, double perfBudgetMs)
 {
-    Console.WriteLine($"Benchmark Mode: shots={shots}, seed={seed}");
+    string budgetLabel = perfBudgetMs > 0.0
+        ? $"{perfBudgetMs.ToString("F2", CultureInfo.InvariantCulture)}ms/shot"
+        : "off";
+    Console.WriteLine($"Benchmark Mode: shots={shots}, seed={seed}, profile={profile.SimulationHz}Hz, budget={budgetLabel}");
 
     Random rng = new(seed + 17);
     Stopwatch shotTimer = new();
 
     double totalMs = 0.0;
     double worstMs = 0.0;
+    double totalSimSeconds = 0.0;
+    long totalSteps = 0;
+    int completedShots = 0;
+    int rejectedShots = 0;
+    List<double> shotTimesMs = new(shots);
 
     for (int i = 0; i < shots; i++)
     {
@@ -315,15 +331,18 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
 
         if (!engine.CueStrike(shot))
         {
+            rejectedShots++;
             continue;
         }
 
         shotTimer.Restart();
         double elapsed = 0.0;
+        int steps = 0;
         while (elapsed < 12.0)
         {
             SimulationFrame frame = engine.Step(1.0 / profile.SimulationHz);
             elapsed += 1.0 / profile.SimulationHz;
+            steps++;
             if (frame.IsAtRest)
             {
                 break;
@@ -334,10 +353,142 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
         double ms = shotTimer.Elapsed.TotalMilliseconds;
         totalMs += ms;
         worstMs = Math.Max(worstMs, ms);
+        totalSimSeconds += elapsed;
+        totalSteps += steps;
+        completedShots++;
+        shotTimesMs.Add(ms);
     }
 
-    double avgMs = shots > 0 ? totalMs / shots : 0.0;
-    Console.WriteLine($"Benchmark: avg={avgMs:F3}ms/shot worst={worstMs:F3}ms/shot simHz={profile.SimulationHz}");
+    if (completedShots == 0)
+    {
+        Console.WriteLine("Benchmark: no completed shots");
+        return;
+    }
+
+    shotTimesMs.Sort();
+    double avgMs = totalMs / completedShots;
+    double p50Ms = Percentile(shotTimesMs, 0.50);
+    double p95Ms = Percentile(shotTimesMs, 0.95);
+    double p99Ms = Percentile(shotTimesMs, 0.99);
+    double avgSimSeconds = totalSimSeconds / completedShots;
+    double avgSteps = (double)totalSteps / completedShots;
+    double msPerSimSecond = totalSimSeconds > 1e-9 ? totalMs / totalSimSeconds : 0.0;
+    double realTimeFactor = totalMs > 1e-9 ? (totalSimSeconds * 1000.0) / totalMs : 0.0;
+
+    Console.WriteLine($"Benchmark: avg={avgMs:F3}ms p50={p50Ms:F3}ms p95={p95Ms:F3}ms p99={p99Ms:F3}ms worst={worstMs:F3}ms");
+    Console.WriteLine($"Benchmark Breakdown: completed={completedShots}/{shots} rejected={rejectedShots} avgSteps={avgSteps:F1} avgSim={avgSimSeconds:F3}s");
+    Console.WriteLine($"Benchmark Throughput: msPerSimSecond={msPerSimSecond:F3} realtimeFactor={realTimeFactor:F2}x");
+
+    if (perfBudgetMs > 0.0)
+    {
+        bool warn = false;
+        if (avgMs > perfBudgetMs)
+        {
+            Console.WriteLine($"WARN perf: avg shot time {avgMs:F3}ms exceeds budget {perfBudgetMs:F3}ms");
+            warn = true;
+        }
+
+        if (p95Ms > perfBudgetMs * 1.25)
+        {
+            Console.WriteLine($"WARN perf: p95 shot time {p95Ms:F3}ms exceeds 125% budget");
+            warn = true;
+        }
+
+        if (worstMs > perfBudgetMs * 2.0)
+        {
+            Console.WriteLine($"WARN perf: worst shot time {worstMs:F3}ms exceeds 200% budget");
+            warn = true;
+        }
+
+        if (!warn)
+        {
+            Console.WriteLine("PASS perf: benchmark is within configured budget");
+        }
+        else if (profile.SimulationHz >= 480)
+        {
+            Console.WriteLine("Hint: try `--profile balanced` or `--profile debug240` for manual perf preset fallback.");
+        }
+    }
+}
+
+static void ApplyProfilePreset(PhysicsProfile profile, string preset)
+{
+    string normalized = NormalizeProfilePreset(preset);
+
+    if (normalized == "physics")
+    {
+        profile.SimulationHz = 480;
+        profile.MaxSubstepsPerFrame = 4;
+        profile.MaxCollisionIterationsPerStep = 16;
+        profile.PostCollisionPositionIterations = 6;
+        return;
+    }
+
+    if (normalized == "balanced")
+    {
+        profile.SimulationHz = 360;
+        profile.MaxSubstepsPerFrame = 4;
+        profile.MaxCollisionIterationsPerStep = 14;
+        profile.PostCollisionPositionIterations = 4;
+        return;
+    }
+
+    if (normalized == "debug240")
+    {
+        profile.SimulationHz = 240;
+        profile.MaxSubstepsPerFrame = 3;
+        profile.MaxCollisionIterationsPerStep = 10;
+        profile.PostCollisionPositionIterations = 3;
+        return;
+    }
+
+    ApplyProfilePreset(profile, "physics");
+}
+
+static string NormalizeProfilePreset(string preset)
+{
+    string normalized = preset.Trim().ToLowerInvariant();
+    if (normalized is "physics" or "physics480" or "default")
+    {
+        return "physics";
+    }
+
+    if (normalized is "balanced" or "balanced360")
+    {
+        return "balanced";
+    }
+
+    if (normalized is "debug240" or "debug" or "perf240")
+    {
+        return "debug240";
+    }
+
+    return "physics";
+}
+
+static double Percentile(IReadOnlyList<double> sortedValues, double p)
+{
+    if (sortedValues.Count == 0)
+    {
+        return 0.0;
+    }
+
+    if (sortedValues.Count == 1)
+    {
+        return sortedValues[0];
+    }
+
+    double clamped = Math.Clamp(p, 0.0, 1.0);
+    double index = clamped * (sortedValues.Count - 1);
+    int lo = (int)Math.Floor(index);
+    int hi = (int)Math.Ceiling(index);
+    if (lo == hi)
+    {
+        return sortedValues[lo];
+    }
+
+    double t = index - lo;
+    return sortedValues[lo] + ((sortedValues[hi] - sortedValues[lo]) * t);
 }
 
 static int RunSanityChecks(PhysicsProfile profile)
@@ -1063,6 +1214,9 @@ internal sealed class RunnerOptions
     public int StressShots { get; private set; }
     public int BenchmarkShots { get; private set; }
     public int RandomSeed { get; private set; } = 1337;
+    public string ProfilePreset { get; private set; } = "physics";
+    public double PerfBudgetMs { get; private set; }
+    public bool ForceBaseline { get; private set; }
     public string? FixturePath { get; private set; }
 
     public static RunnerOptions Parse(string[] args)
@@ -1102,6 +1256,18 @@ internal sealed class RunnerOptions
                     options.RandomSeed = ReadIntArg(args, ref i, options.RandomSeed, minValue: int.MinValue);
                     break;
 
+                case "--profile":
+                    options.ProfilePreset = ReadStringArg(args, ref i, options.ProfilePreset);
+                    break;
+
+                case "--perf-budget-ms":
+                    options.PerfBudgetMs = ReadDoubleArg(args, ref i, 0.0, minValue: 0.0);
+                    break;
+
+                case "--force-baseline":
+                    options.ForceBaseline = true;
+                    break;
+
                 case "--fixtures":
                     if (i + 1 < args.Length)
                     {
@@ -1134,6 +1300,45 @@ internal sealed class RunnerOptions
         }
 
         return Math.Max(minValue, parsed);
+    }
+
+    private static double ReadDoubleArg(string[] args, ref int i, double fallback, double minValue)
+    {
+        if (i + 1 >= args.Length)
+        {
+            return fallback;
+        }
+
+        string candidate = args[i + 1];
+        if (candidate.StartsWith("--", StringComparison.Ordinal))
+        {
+            return fallback;
+        }
+
+        i++;
+        if (!double.TryParse(candidate, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out double parsed))
+        {
+            return fallback;
+        }
+
+        return Math.Max(minValue, parsed);
+    }
+
+    private static string ReadStringArg(string[] args, ref int i, string fallback)
+    {
+        if (i + 1 >= args.Length)
+        {
+            return fallback;
+        }
+
+        string candidate = args[i + 1];
+        if (candidate.StartsWith("--", StringComparison.Ordinal))
+        {
+            return fallback;
+        }
+
+        i++;
+        return candidate;
     }
 }
 

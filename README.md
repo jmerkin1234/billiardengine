@@ -71,6 +71,23 @@ Run randomized stress invariants (no overlap/out-of-bounds/non-finite):
 dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --stress 1000 --seed 1337
 ```
 
+Run benchmark with profile presets and perf budget warnings:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark 120 --profile physics --perf-budget-ms 6
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark 120 --profile balanced --perf-budget-ms 6
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark 120 --profile debug240 --perf-budget-ms 6
+```
+
+Profile presets:
+- `physics` (default): 480Hz, highest fidelity.
+- `balanced`: 360Hz, moderate fallback.
+- `debug240`: 240Hz, manual perf fallback.
+
+Notes:
+- Baseline fixture comparison is auto-skipped for non-`physics` presets.
+- Add `--force-baseline` to compare fixture expectations on non-default presets.
+
 ## Unity Integration (Adapter)
 
 1. Add the built DLL or source from `src/BilliardsPhysicsEngine` to your Unity project.

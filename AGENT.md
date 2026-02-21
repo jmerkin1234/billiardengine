@@ -18,12 +18,14 @@ Working log for ongoing Codex changes in this repository.
   - fixed ball-ball relative normal sign handling in collision impulse resolution
   - added iterative residual penetration solver
   - exposed extra stabilization tuning in `PhysicsProfile`
+  - added benchmark profile presets + perf warning thresholds in runner
 - Validation status:
   - `dotnet build` passes
   - `--sanity` passes (head-on transfer, overlap recovery, rail bounce, pocket event emission, shot lifecycle events, prediction isolation)
   - `--determinism 3` passes
   - `--stress 1000 --seed 1337` passes
   - baseline suite passes `10/10` against current fixture
+  - `--benchmark` reports avg/p50/p95/p99/worst plus sim-step throughput and budget warnings
 
 ## Next Work Queue
 - Improve physical realism against external references (beyond self-baseline parity).
@@ -35,3 +37,4 @@ Working log for ongoing Codex changes in this repository.
   - initialized standalone repo and pushed to GitHub
   - completed collision stability pass and re-baselined fixture suite
   - expanded sanity-mode checks with pocket events, shot lifecycle events, and prediction isolation checks
+  - added benchmark profile presets (`physics`, `balanced`, `debug240`) and non-default baseline guard (`--force-baseline`)

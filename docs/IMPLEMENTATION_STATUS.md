@@ -37,6 +37,8 @@ Date: 2026-02-21
     - prediction isolation
   - deterministic rerun checks (`--determinism`)
   - randomized stress invariants (`--stress`)
+  - benchmark breakdown + perf warnings (`--benchmark`, `--profile`, `--perf-budget-ms`)
+  - non-default profile baseline guard (skips fixture compare unless `--force-baseline`)
 - Stability fixes:
   - corrected ball-ball normal-velocity sign handling in impulse resolution
   - added iterative post-collision penetration stabilization pass
@@ -48,6 +50,7 @@ Date: 2026-02-21
 - Sanity checks (6/6) pass without Unity scene/model dependencies.
 - Determinism check passes across repeated runs.
 - Stress check passes at 1000 randomized shots (seed 1337).
+- Benchmark profile presets execute with detailed throughput metrics and warning thresholds.
 
 ## Deferred (Post-V1)
 
