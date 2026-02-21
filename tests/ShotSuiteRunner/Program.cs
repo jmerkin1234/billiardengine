@@ -343,6 +343,7 @@ static void RunBenchmarkMode(BilliardPhysicsEngine engine, RackPreset rack, Phys
 static int RunSanityChecks(PhysicsProfile profile)
 {
     Console.WriteLine("Sanity Checks");
+    const int TotalChecks = 6;
     int failures = 0;
 
     if (RunHeadOnCollisionSanity(profile, out string headOnReason))
@@ -375,7 +376,37 @@ static int RunSanityChecks(PhysicsProfile profile)
         failures++;
     }
 
-    Console.WriteLine($"Sanity Check Complete: Passed={3 - failures} Failed={failures}");
+    if (RunPocketEventSanity(profile, out string pocketReason))
+    {
+        Console.WriteLine("PASS sanity: pocket event emission");
+    }
+    else
+    {
+        Console.WriteLine($"FAIL sanity: pocket event emission ({pocketReason})");
+        failures++;
+    }
+
+    if (RunShotLifecycleSanity(profile, out string lifecycleReason))
+    {
+        Console.WriteLine("PASS sanity: shot lifecycle events");
+    }
+    else
+    {
+        Console.WriteLine($"FAIL sanity: shot lifecycle events ({lifecycleReason})");
+        failures++;
+    }
+
+    if (RunPredictionIsolationSanity(profile, out string predictionReason))
+    {
+        Console.WriteLine("PASS sanity: prediction isolation");
+    }
+    else
+    {
+        Console.WriteLine($"FAIL sanity: prediction isolation ({predictionReason})");
+        failures++;
+    }
+
+    Console.WriteLine($"Sanity Check Complete: Passed={TotalChecks - failures} Failed={failures}");
     return failures == 0 ? 0 : 1;
 }
 
@@ -584,6 +615,199 @@ static bool RunRailBounceSanity(PhysicsProfile profile, out string reason)
 
     reason = "no rail contact detected within horizon";
     return false;
+}
+
+static bool RunPocketEventSanity(PhysicsProfile profile, out string reason)
+{
+    BilliardPhysicsEngine engine = new();
+    TableGeometry table = TableGeometry.CreateEightFoot(0.0);
+    double y = table.SurfaceY + profile.BallRadius;
+
+    BallInitState[] states =
+    {
+        BallInitState.Create(
+            0,
+            new PhysVector3(table.MaxXZ.X - profile.BallRadius, y, table.MaxXZ.Y - profile.BallRadius),
+            profile.BallRadius,
+            profile.BallMass,
+            true)
+    };
+
+    engine.Initialize(table, profile, states);
+
+    for (int i = 0; i < 20; i++)
+    {
+        SimulationFrame frame = engine.Step(1.0 / profile.SimulationHz);
+        if (!ValidateNumericFrame(frame, out reason))
+        {
+            return false;
+        }
+
+        bool pocketEvent = false;
+        for (int e = 0; e < frame.Events.Length; e++)
+        {
+            PhysicsEvent evt = frame.Events[e];
+            if (evt.Type == PhysicsEventType.Pocketed && evt.BallAId == 0)
+            {
+                pocketEvent = true;
+                break;
+            }
+        }
+
+        if (!pocketEvent)
+        {
+            continue;
+        }
+
+        if (!TryGetBall(frame, 0, out BallState ball))
+        {
+            reason = "missing pocket sanity ball";
+            return false;
+        }
+
+        if (!ball.IsPocketed || ball.InPlay)
+        {
+            reason = "ball state not pocketed after pocket event";
+            return false;
+        }
+
+        reason = string.Empty;
+        return true;
+    }
+
+    reason = "no pocket event detected within horizon";
+    return false;
+}
+
+static bool RunShotLifecycleSanity(PhysicsProfile profile, out string reason)
+{
+    BilliardPhysicsEngine engine = new();
+    TableGeometry table = TableGeometry.CreateEightFoot(0.0);
+    double y = table.SurfaceY + profile.BallRadius;
+
+    BallInitState[] states =
+    {
+        BallInitState.Create(0, new PhysVector3(0.0, y, 0.0), profile.BallRadius, profile.BallMass, true)
+    };
+
+    engine.Initialize(table, profile, states);
+    CueShotInput shot = new(
+        0,
+        new PhysVector3(0.0, 0.0, -1.0),
+        0.08,
+        PhysVector2.Zero,
+        0.0,
+        0.525,
+        0.006,
+        18.0);
+
+    if (!engine.CueStrike(shot))
+    {
+        reason = "cue strike rejected";
+        return false;
+    }
+
+    bool sawShotStarted = false;
+    bool sawAllStopped = false;
+
+    for (int i = 0; i < profile.SimulationHz * 8; i++)
+    {
+        SimulationFrame frame = engine.Step(1.0 / profile.SimulationHz);
+        if (!ValidateNumericFrame(frame, out reason))
+        {
+            return false;
+        }
+
+        for (int e = 0; e < frame.Events.Length; e++)
+        {
+            PhysicsEvent evt = frame.Events[e];
+            if (evt.Type == PhysicsEventType.ShotStarted)
+            {
+                sawShotStarted = true;
+            }
+            else if (evt.Type == PhysicsEventType.AllBallsStopped)
+            {
+                sawAllStopped = true;
+            }
+        }
+
+        if (sawShotStarted && sawAllStopped && frame.IsAtRest)
+        {
+            reason = string.Empty;
+            return true;
+        }
+    }
+
+    if (!sawShotStarted)
+    {
+        reason = "ShotStarted event never emitted";
+        return false;
+    }
+
+    if (!sawAllStopped)
+    {
+        reason = "AllBallsStopped event never emitted";
+        return false;
+    }
+
+    reason = "world did not settle after AllBallsStopped";
+    return false;
+}
+
+static bool RunPredictionIsolationSanity(PhysicsProfile profile, out string reason)
+{
+    BilliardPhysicsEngine engine = new();
+    TableGeometry table = TableGeometry.CreateEightFoot(0.0);
+    double y = table.SurfaceY + profile.BallRadius;
+
+    BallInitState[] states =
+    {
+        BallInitState.Create(0, new PhysVector3(0.0, y, 0.35), profile.BallRadius, profile.BallMass, true),
+        BallInitState.Create(1, new PhysVector3(0.0, y, 0.20), profile.BallRadius, profile.BallMass, false)
+    };
+
+    engine.Initialize(table, profile, states);
+    SimulationFrame before = engine.Step(0.0);
+
+    CueShotInput shot = new(
+        0,
+        new PhysVector3(0.0, 0.0, -1.0),
+        0.65,
+        PhysVector2.Zero,
+        0.0,
+        0.525,
+        0.006,
+        18.0);
+
+    var prediction = engine.GetTrajectoryPrediction(shot, PredictionSettings.Default);
+    SimulationFrame after = engine.Step(0.0);
+
+    if (!FramesNearlyEqual(before, after, DeterminismEpsilon))
+    {
+        reason = "prediction mutated live world state";
+        return false;
+    }
+
+    if (prediction.SimulatedSeconds <= 0.0)
+    {
+        reason = "prediction simulated time is zero";
+        return false;
+    }
+
+    if (!prediction.TryGetPoints(0, out IReadOnlyList<PhysVector3> cuePoints) || cuePoints.Count < 2)
+    {
+        reason = "prediction did not produce cue-ball path points";
+        return false;
+    }
+
+    if (prediction.FirstContactBallId != 1)
+    {
+        reason = $"unexpected first contact ball id ({prediction.FirstContactBallId})";
+        return false;
+    }
+
+    reason = string.Empty;
+    return true;
 }
 
 static bool TryGetBall(in SimulationFrame frame, int ballId, out BallState state)

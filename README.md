@@ -51,6 +51,14 @@ Run standalone sanity checks (no Unity model required):
 dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --sanity
 ```
 
+Current sanity coverage:
+- head-on ball-ball transfer
+- overlap recovery
+- rail bounce response
+- pocket event emission
+- shot lifecycle events (`ShotStarted`, `AllBallsStopped`)
+- prediction isolation (predictor does not mutate live world)
+
 Run deterministic replay check:
 
 ```bash

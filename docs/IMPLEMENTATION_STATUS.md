@@ -28,7 +28,13 @@ Date: 2026-02-21
 - Implemented validation harness:
   - `tests/ShotSuiteRunner`
   - 10-case shot suite fixture and baseline recorder
-  - standalone sanity checks (`--sanity`)
+  - standalone sanity checks (`--sanity`):
+    - head-on transfer
+    - overlap recovery
+    - rail bounce response
+    - pocket event emission
+    - shot lifecycle events
+    - prediction isolation
   - deterministic rerun checks (`--determinism`)
   - randomized stress invariants (`--stress`)
 - Stability fixes:
@@ -39,7 +45,7 @@ Date: 2026-02-21
 
 - `dotnet build` succeeds for core and test projects.
 - Shot suite runner executes and passes against recorded baseline fixture.
-- Sanity checks pass without Unity scene/model dependencies.
+- Sanity checks (6/6) pass without Unity scene/model dependencies.
 - Determinism check passes across repeated runs.
 - Stress check passes at 1000 randomized shots (seed 1337).
 

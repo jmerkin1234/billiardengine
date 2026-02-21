@@ -20,7 +20,7 @@ Working log for ongoing Codex changes in this repository.
   - exposed extra stabilization tuning in `PhysicsProfile`
 - Validation status:
   - `dotnet build` passes
-  - `--sanity` passes (head-on transfer, overlap recovery, rail bounce)
+  - `--sanity` passes (head-on transfer, overlap recovery, rail bounce, pocket event emission, shot lifecycle events, prediction isolation)
   - `--determinism 3` passes
   - `--stress 1000 --seed 1337` passes
   - baseline suite passes `10/10` against current fixture
@@ -34,4 +34,4 @@ Working log for ongoing Codex changes in this repository.
 - 2026-02-21:
   - initialized standalone repo and pushed to GitHub
   - completed collision stability pass and re-baselined fixture suite
-  - added standalone sanity-mode checks to test runner
+  - expanded sanity-mode checks with pocket events, shot lifecycle events, and prediction isolation checks
