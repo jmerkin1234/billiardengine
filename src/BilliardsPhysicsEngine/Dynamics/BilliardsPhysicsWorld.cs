@@ -167,6 +167,7 @@ public sealed class BilliardsPhysicsWorld
 
         BilliardsPhysicsWorld preview = Clone();
         TrajectoryPrediction prediction = new();
+        double shotStartTime = preview._simulationTime;
 
         for (int i = 0; i < preview._balls.Length; i++)
         {
@@ -214,6 +215,8 @@ public sealed class BilliardsPhysicsWorld
                     if (resolved >= 0)
                     {
                         firstContactBallId = resolved;
+                        double relativeContactTime = Math.Max(0.0, evt.Time - shotStartTime);
+                        prediction.SetFirstContact(resolved, evt.Position, relativeContactTime);
                     }
                 }
             }

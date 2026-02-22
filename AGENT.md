@@ -20,6 +20,7 @@ Working log for ongoing Codex changes in this repository.
   - exposed extra stabilization tuning in `PhysicsProfile`
   - added benchmark profile presets + perf warning thresholds in runner
   - added benchmark matrix runner that writes markdown report tables
+  - added first-contact prediction metadata + ghost marker overlay support
 - Validation status:
   - `dotnet build` passes
   - `--sanity` passes (head-on transfer, overlap recovery, rail bounce, pocket event emission, shot lifecycle events, prediction isolation)
@@ -41,3 +42,4 @@ Working log for ongoing Codex changes in this repository.
   - expanded sanity-mode checks with pocket events, shot lifecycle events, and prediction isolation checks
   - added benchmark profile presets (`physics`, `balanced`, `debug240`) and non-default baseline guard (`--force-baseline`)
   - added benchmark matrix command (`--benchmark-matrix`) and markdown report output path (`--benchmark-report`)
+  - added prediction first-contact point/time metadata and hooked first-contact marker rendering into `GhostPathRenderer`

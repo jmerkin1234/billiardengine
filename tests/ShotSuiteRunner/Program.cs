@@ -1071,6 +1071,24 @@ static bool RunPredictionIsolationSanity(PhysicsProfile profile, out string reas
         return false;
     }
 
+    if (!prediction.HasFirstContact)
+    {
+        reason = "prediction did not expose first-contact metadata";
+        return false;
+    }
+
+    if (!IsFinite(prediction.FirstContactPoint.X) || !IsFinite(prediction.FirstContactPoint.Y) || !IsFinite(prediction.FirstContactPoint.Z))
+    {
+        reason = "prediction first-contact point is non-finite";
+        return false;
+    }
+
+    if (prediction.FirstContactTimeSeconds < 0.0 || prediction.FirstContactTimeSeconds > prediction.SimulatedSeconds + (1.0 / profile.SimulationHz))
+    {
+        reason = $"prediction first-contact time out of range ({prediction.FirstContactTimeSeconds:F4}s)";
+        return false;
+    }
+
     reason = string.Empty;
     return true;
 }

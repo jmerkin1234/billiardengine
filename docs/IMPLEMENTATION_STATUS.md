@@ -20,11 +20,13 @@ Date: 2026-02-21
   - rest detection + `AllBallsStopped` event
 - Implemented prediction:
   - shot trajectory prediction and first-contact tracking
+  - first-contact metadata output (ball id, contact point, contact time)
 - Implemented Unity adapters (drop-in scripts):
   - runtime controller
   - cue strike adapter
   - compatibility shims
   - training/ghost-path helpers
+  - first-contact ghost marker overlay in training renderer
 - Implemented validation harness:
   - `tests/ShotSuiteRunner`
   - 10-case shot suite fixture and baseline recorder
@@ -49,6 +51,7 @@ Date: 2026-02-21
 - `dotnet build` succeeds for core and test projects.
 - Shot suite runner executes and passes against recorded baseline fixture.
 - Sanity checks (6/6) pass without Unity scene/model dependencies.
+- Prediction sanity includes first-contact metadata validity checks.
 - Determinism check passes across repeated runs.
 - Stress check passes at 1000 randomized shots (seed 1337).
 - Benchmark profile presets execute with detailed throughput metrics and warning thresholds.

@@ -17,6 +17,9 @@ public sealed class TrajectoryPrediction
 
     public double SimulatedSeconds { get; set; }
     public int FirstContactBallId { get; set; } = -1;
+    public PhysVector3 FirstContactPoint { get; private set; } = PhysVector3.Zero;
+    public double FirstContactTimeSeconds { get; private set; } = -1.0;
+    public bool HasFirstContact => FirstContactBallId >= 0 && FirstContactTimeSeconds >= 0.0;
 
     public void AddPoint(int ballId, in PhysVector3 point)
     {
@@ -30,6 +33,20 @@ public sealed class TrajectoryPrediction
     }
 
     public void SetPocketed(int ballId) => _pocketed.Add(ballId);
+
+    public bool IsPocketed(int ballId) => _pocketed.Contains(ballId);
+
+    public void SetFirstContact(int ballId, in PhysVector3 point, double timeSeconds)
+    {
+        if (HasFirstContact)
+        {
+            return;
+        }
+
+        FirstContactBallId = ballId;
+        FirstContactPoint = point;
+        FirstContactTimeSeconds = timeSeconds;
+    }
 
     public bool TryGetPoints(int ballId, out IReadOnlyList<PhysVector3> points)
     {

@@ -14,8 +14,13 @@ public class GhostPathRenderer : MonoBehaviour
     [SerializeField] private Vector2 tipOffset = Vector2.zero;
     [SerializeField] private float refreshInterval = 0.2f;
     [SerializeField] private float horizonSeconds = 4f;
+    [SerializeField] private bool showFirstContactMarker = true;
+    [SerializeField] private GameObject? firstContactMarkerPrefab;
+    [SerializeField] private Color firstContactMarkerColor = Color.cyan;
+    [SerializeField] private float firstContactMarkerSize = 0.03f;
 
     private LineRenderer? _line;
+    private Transform? _firstContactMarker;
     private float _nextRefresh;
 
     private void Awake()
@@ -29,6 +34,8 @@ public class GhostPathRenderer : MonoBehaviour
             _line.startWidth = 0.01f;
             _line.endWidth = 0.01f;
         }
+
+        EnsureFirstContactMarker();
     }
 
     private void LateUpdate()
@@ -56,6 +63,7 @@ public class GhostPathRenderer : MonoBehaviour
         if (!prediction.TryGetPoints(shotBallId, out var points) || points.Count < 2)
         {
             _line.positionCount = 0;
+            SetFirstContactMarkerVisible(false);
             return;
         }
 
@@ -63,6 +71,79 @@ public class GhostPathRenderer : MonoBehaviour
         for (int i = 0; i < points.Count; i++)
         {
             _line.SetPosition(i, new Vector3((float)points[i].X, (float)points[i].Y + 0.002f, (float)points[i].Z));
+        }
+
+        if (!showFirstContactMarker)
+        {
+            SetFirstContactMarkerVisible(false);
+            return;
+        }
+
+        EnsureFirstContactMarker();
+        if (_firstContactMarker is null)
+        {
+            return;
+        }
+
+        if (prediction.HasFirstContact)
+        {
+            PhysVector3 p = prediction.FirstContactPoint;
+            _firstContactMarker.position = new Vector3((float)p.X, (float)p.Y + 0.01f, (float)p.Z);
+            SetFirstContactMarkerVisible(true);
+        }
+        else
+        {
+            SetFirstContactMarkerVisible(false);
+        }
+    }
+
+    private void EnsureFirstContactMarker()
+    {
+        if (!showFirstContactMarker || _firstContactMarker is not null)
+        {
+            return;
+        }
+
+        if (firstContactMarkerPrefab is not null)
+        {
+            GameObject instance = Instantiate(firstContactMarkerPrefab, transform);
+            _firstContactMarker = instance.transform;
+        }
+        else
+        {
+            GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            marker.name = "GhostFirstContactMarker";
+            marker.transform.SetParent(transform, worldPositionStays: false);
+            marker.transform.localScale = Vector3.one * firstContactMarkerSize;
+            var markerCollider = marker.GetComponent<Collider>();
+            if (markerCollider is not null)
+            {
+                Destroy(markerCollider);
+            }
+
+            var markerRenderer = marker.GetComponent<Renderer>();
+            if (markerRenderer is not null)
+            {
+                markerRenderer.material = new Material(Shader.Find("Standard"));
+                markerRenderer.material.color = firstContactMarkerColor;
+            }
+
+            _firstContactMarker = marker.transform;
+        }
+
+        SetFirstContactMarkerVisible(false);
+    }
+
+    private void SetFirstContactMarkerVisible(bool visible)
+    {
+        if (_firstContactMarker is null)
+        {
+            return;
+        }
+
+        if (_firstContactMarker.gameObject.activeSelf != visible)
+        {
+            _firstContactMarker.gameObject.SetActive(visible);
         }
     }
 }

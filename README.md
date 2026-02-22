@@ -15,7 +15,7 @@ This workspace contains a standalone billiards physics engine rewrite for 8ft 8-
   - `Config`: physics profile (canonical tuning source)
   - `Collision`: CCD utilities
   - `Dynamics`: `BilliardsPhysicsWorld` fixed-step impulse solver
-  - `Prediction`: ghost-path trajectory prediction
+- `Prediction`: ghost-path trajectory prediction
 - `unity-adapter`
   - `Runtime`: `UnityPhysicsRuntimeController`, `UnityCueStrikeAdapter`
   - `Compatibility`: shims for legacy-style ball/spin/pocket access
@@ -111,10 +111,12 @@ Notes:
 4. Assign balls by tag (`CueBall`, `Ball`) or explicit list.
 5. Route shot release to `UnityCueStrikeAdapter.SubmitShot(...)`.
 6. Optional: add `TrainingModeController` and `GhostPathRenderer`.
+   - `GhostPathRenderer` now supports a first-contact marker overlay using prediction metadata.
 
 ## Notes
 
 - Core sim is engine-authoritative, fixed-step, and event-driven.
+- Prediction output includes first-contact ball id, point, and relative time metadata.
 - Ball-ball response includes corrected relative-normal sign handling and post-collision penetration stabilization.
 - Jump/massé/squirt/miscue are intentionally deferred (post-V1 backlog).
 - Baseline fixture currently contains recorded output from this solver build; if solver logic changes, re-record baseline.
