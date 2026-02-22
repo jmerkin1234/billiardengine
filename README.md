@@ -109,6 +109,25 @@ dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/S
 Default validation report output:
 - `/home/justin/Pictures/billiardengine/engine-rewrite/docs/VALIDATION_REPORT.md`
 
+Build an online reference pack (no local table required) from public clip annotations:
+
+```bash
+/home/justin/Pictures/billiardengine/engine-rewrite/tools/online_reference/fetch_and_build_cv_reference_pack.sh
+```
+
+Default online reference pack output:
+- `/home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/online_reference_pack.json`
+
+Generate an online reference summary report:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --online-reference-report --online-reference-pack /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/online_reference_pack.json
+```
+
+Default online reference report output:
+- `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_REFERENCE_REPORT.md`
+- source ledger: `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_REFERENCE_SOURCES.md`
+
 Profile presets:
 - `physics` (default): 480Hz, highest fidelity.
 - `balanced`: 360Hz, moderate fallback.
@@ -137,3 +156,4 @@ Notes:
 - Ball-ball response includes corrected relative-normal sign handling and post-collision penetration stabilization.
 - Jump/massé/squirt/miscue are intentionally deferred (post-V1 backlog).
 - Baseline fixture is currently tagged `SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE` and not yet marked as real-world reference data.
+- Online pack references are currently coarse first/last frame observations from public clips (not direct fixture pass/fail gates yet).

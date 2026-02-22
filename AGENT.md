@@ -23,6 +23,8 @@ Working log for ongoing Codex changes in this repository.
   - added first-contact prediction metadata + ghost marker overlay support
   - hardened fixture schema with locked reference metadata + event expectation gates
   - added validation report generator with per-preset pass/fail deltas
+  - added online-reference ingestion pipeline (`tools/online_reference`)
+  - added online-reference runner mode (`--online-reference-report`) and docs output (`docs/ONLINE_REFERENCE_REPORT.md`)
 - Validation status:
   - `dotnet build` passes
   - `--sanity` passes (head-on transfer, overlap recovery, rail bounce, pocket event emission, shot lifecycle events, prediction isolation)
@@ -32,6 +34,7 @@ Working log for ongoing Codex changes in this repository.
   - `--benchmark` reports avg/p50/p95/p99/worst plus sim-step throughput and budget warnings
   - `--benchmark-matrix` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/BENCHMARK_MATRIX.md`
   - `--validation-report` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/VALIDATION_REPORT.md`
+  - `--online-reference-report` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_REFERENCE_REPORT.md`
   - `--require-real-reference` currently fails because fixture metadata is placeholder (`SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE`)
 
 ## Next Work Queue
@@ -51,3 +54,6 @@ Working log for ongoing Codex changes in this repository.
   - added locked reference metadata and event expectation checks to fixture schema
   - added real-world reference enforcement flag (`--require-real-reference`)
   - added full validation report command (`--validation-report`) and docs report output (`docs/VALIDATION_REPORT.md`)
+  - added online dataset import script for public 8-ball clip annotations (`build_cv_reference_pack.py`)
+  - added fetch+build wrapper (`fetch_and_build_cv_reference_pack.sh`) and generated `tests/ShotSuiteRunner/fixtures/online_reference_pack.json`
+  - added online reference summary mode (`--online-reference-report`) and generated `docs/ONLINE_REFERENCE_REPORT.md`

@@ -1,6 +1,6 @@
 # Implementation Status
 
-Date: 2026-02-21
+Date: 2026-02-22
 
 ## Completed
 
@@ -47,7 +47,13 @@ Date: 2026-02-21
   - benchmark breakdown + perf warnings (`--benchmark`, `--profile`, `--perf-budget-ms`)
   - benchmark matrix markdown report (`--benchmark-matrix`, optional `--benchmark-report`)
   - full validation report markdown (`--validation-report`, optional `--validation-report-path`)
+  - online reference report mode (`--online-reference-report`) for coarse external clip metrics
   - non-default profile baseline guard (skips fixture compare unless `--force-baseline`)
+- Implemented online reference ingestion tooling:
+  - `tools/online_reference/build_cv_reference_pack.py`
+  - `tools/online_reference/fetch_and_build_cv_reference_pack.sh`
+  - generated pack fixture: `tests/ShotSuiteRunner/fixtures/online_reference_pack.json`
+  - generated report: `docs/ONLINE_REFERENCE_REPORT.md`
 - Stability fixes:
   - corrected ball-ball normal-velocity sign handling in impulse resolution
   - added iterative post-collision penetration stabilization pass
@@ -63,6 +69,7 @@ Date: 2026-02-21
 - Benchmark profile presets execute with detailed throughput metrics and warning thresholds.
 - Benchmark matrix runner writes a docs report table at `docs/BENCHMARK_MATRIX.md`.
 - Validation report runner writes preset delta summaries at `docs/VALIDATION_REPORT.md`.
+- Online reference report mode writes dataset summary metrics at `docs/ONLINE_REFERENCE_REPORT.md`.
 
 ## Deferred (Post-V1)
 

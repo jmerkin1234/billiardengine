@@ -1,0 +1,3931 @@
+{
+  "Source": {
+    "Name": "CV_Project",
+    "Repository": "https://github.com/matteodalnevo/CV_Project",
+    "RepositoryCommit": "d8de7952782a36c17e5d427cb8ff8649f1703025",
+    "DatasetPath": "/tmp/billiard_online_refs/CV_Project/data",
+    "DatasetLicense": "UNSPECIFIED_IN_REPOSITORY",
+    "Notes": "10 clip benchmark with first/last frame annotations. Used as coarse real-world reference candidates."
+  },
+  "GeneratedAtUtc": "2026-02-22T02:19:22Z",
+  "Table": {
+    "PlayfieldWidthMeters": 1.1176,
+    "PlayfieldLengthMeters": 2.2352,
+    "TableCornersPx": [
+      [
+        82.0,
+        81.0
+      ],
+      [
+        82.0,
+        756.0
+      ],
+      [
+        1384.0,
+        756.0
+      ],
+      [
+        1384.0,
+        81.0
+      ]
+    ],
+    "CornerOrder": [
+      "top_left",
+      "bottom_left",
+      "bottom_right",
+      "top_right"
+    ]
+  },
+  "Clips": [
+    {
+      "ClipId": "game1_clip1",
+      "VideoPath": "game1_clip1/game1_clip1.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            276.5,
+            325.5
+          ],
+          "CenterNorm": [
+            0.149386,
+            0.362222
+          ],
+          "CenterMeters": [
+            -0.391847,
+            -0.307961
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            476.5,
+            161.5
+          ],
+          "CenterNorm": [
+            0.302995,
+            0.119259
+          ],
+          "CenterMeters": [
+            -0.220172,
+            -0.851032
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            543.0,
+            372.0
+          ],
+          "CenterNorm": [
+            0.354071,
+            0.431111
+          ],
+          "CenterMeters": [
+            -0.163091,
+            -0.15398
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            330.0,
+            333.0
+          ],
+          "CenterNorm": [
+            0.190476,
+            0.373333
+          ],
+          "CenterMeters": [
+            -0.345924,
+            -0.283125
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            725.0,
+            257.5
+          ],
+          "CenterNorm": [
+            0.493856,
+            0.261481
+          ],
+          "CenterMeters": [
+            -0.006867,
+            -0.533137
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            426.0,
+            229.5
+          ],
+          "CenterNorm": [
+            0.264209,
+            0.22
+          ],
+          "CenterMeters": [
+            -0.26352,
+            -0.625856
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            315.5,
+            214.0
+          ],
+          "CenterNorm": [
+            0.179339,
+            0.197037
+          ],
+          "CenterMeters": [
+            -0.35837,
+            -0.677183
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            477.5,
+            194.5
+          ],
+          "CenterNorm": [
+            0.303763,
+            0.168148
+          ],
+          "CenterMeters": [
+            -0.219314,
+            -0.741755
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            676.5,
+            455.0
+          ],
+          "CenterNorm": [
+            0.456605,
+            0.554074
+          ],
+          "CenterMeters": [
+            -0.048498,
+            0.120866
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            453.0,
+            405.0
+          ],
+          "CenterNorm": [
+            0.284946,
+            0.48
+          ],
+          "CenterMeters": [
+            -0.240344,
+            -0.044704
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            657.5,
+            294.0
+          ],
+          "CenterNorm": [
+            0.442012,
+            0.315556
+          ],
+          "CenterMeters": [
+            -0.064807,
+            -0.41227
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            544.0,
+            260.5
+          ],
+          "CenterNorm": [
+            0.354839,
+            0.265926
+          ],
+          "CenterMeters": [
+            -0.162232,
+            -0.523202
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            280.0,
+            196.0
+          ],
+          "CenterNorm": [
+            0.152074,
+            0.17037
+          ],
+          "CenterMeters": [
+            -0.388842,
+            -0.736788
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            843.0,
+            195.0
+          ],
+          "CenterNorm": [
+            0.584485,
+            0.168889
+          ],
+          "CenterMeters": [
+            0.094421,
+            -0.7401
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            443.0,
+            132.5
+          ],
+          "CenterNorm": [
+            0.277266,
+            0.076296
+          ],
+          "CenterMeters": [
+            -0.248928,
+            -0.947063
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            329.5,
+            209.5
+          ],
+          "CenterNorm": [
+            0.190092,
+            0.19037
+          ],
+          "CenterMeters": [
+            -0.346353,
+            -0.692084
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            476.5,
+            161.0
+          ],
+          "CenterNorm": [
+            0.302995,
+            0.118519
+          ],
+          "CenterMeters": [
+            -0.220172,
+            -0.852687
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            543.0,
+            372.0
+          ],
+          "CenterNorm": [
+            0.354071,
+            0.431111
+          ],
+          "CenterMeters": [
+            -0.163091,
+            -0.15398
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            330.0,
+            333.5
+          ],
+          "CenterNorm": [
+            0.190476,
+            0.374074
+          ],
+          "CenterMeters": [
+            -0.345924,
+            -0.28147
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            725.5,
+            257.5
+          ],
+          "CenterNorm": [
+            0.49424,
+            0.261481
+          ],
+          "CenterMeters": [
+            -0.006438,
+            -0.533137
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            311.0,
+            216.5
+          ],
+          "CenterNorm": [
+            0.175883,
+            0.200741
+          ],
+          "CenterMeters": [
+            -0.362233,
+            -0.668904
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            477.5,
+            194.5
+          ],
+          "CenterNorm": [
+            0.303763,
+            0.168148
+          ],
+          "CenterMeters": [
+            -0.219314,
+            -0.741755
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            557.5,
+            150.5
+          ],
+          "CenterNorm": [
+            0.365207,
+            0.102963
+          ],
+          "CenterMeters": [
+            -0.150644,
+            -0.887457
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            676.0,
+            454.5
+          ],
+          "CenterNorm": [
+            0.456221,
+            0.553333
+          ],
+          "CenterMeters": [
+            -0.048927,
+            0.119211
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            453.0,
+            405.5
+          ],
+          "CenterNorm": [
+            0.284946,
+            0.480741
+          ],
+          "CenterMeters": [
+            -0.240344,
+            -0.043048
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            658.5,
+            292.5
+          ],
+          "CenterNorm": [
+            0.44278,
+            0.313333
+          ],
+          "CenterMeters": [
+            -0.063949,
+            -0.417237
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            544.0,
+            260.5
+          ],
+          "CenterNorm": [
+            0.354839,
+            0.265926
+          ],
+          "CenterMeters": [
+            -0.162232,
+            -0.523202
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            280.0,
+            195.5
+          ],
+          "CenterNorm": [
+            0.152074,
+            0.16963
+          ],
+          "CenterMeters": [
+            -0.388842,
+            -0.738444
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            843.0,
+            194.0
+          ],
+          "CenterNorm": [
+            0.584485,
+            0.167407
+          ],
+          "CenterMeters": [
+            0.094421,
+            -0.743411
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            443.0,
+            132.5
+          ],
+          "CenterNorm": [
+            0.277266,
+            0.076296
+          ],
+          "CenterMeters": [
+            -0.248928,
+            -0.947063
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 15,
+        "LastBallCount": 15,
+        "MatchedBallCount": 15,
+        "EstimatedPocketedBallCount": 0,
+        "EstimatedMovedBallCount": 3,
+        "UnmatchedFirstCount": 0,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.386808,
+        "MeanMatchedDisplacementMeters": 0.046545,
+        "MaxMatchedDisplacementMeters": 0.386808,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game1_clip2",
+      "VideoPath": "game1_clip2/game1_clip2.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            484.5,
+            151.5
+          ],
+          "CenterNorm": [
+            0.30914,
+            0.104444
+          ],
+          "CenterMeters": [
+            -0.213305,
+            -0.884146
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            707.0,
+            234.5
+          ],
+          "CenterNorm": [
+            0.480031,
+            0.227407
+          ],
+          "CenterMeters": [
+            -0.022318,
+            -0.609299
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            579.0,
+            360.0
+          ],
+          "CenterNorm": [
+            0.38172,
+            0.413333
+          ],
+          "CenterMeters": [
+            -0.132189,
+            -0.193717
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            410.0,
+            263.5
+          ],
+          "CenterNorm": [
+            0.25192,
+            0.27037
+          ],
+          "CenterMeters": [
+            -0.277254,
+            -0.513268
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            661.0,
+            234.0
+          ],
+          "CenterNorm": [
+            0.4447,
+            0.226667
+          ],
+          "CenterMeters": [
+            -0.061803,
+            -0.610955
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            610.5,
+            211.5
+          ],
+          "CenterNorm": [
+            0.405914,
+            0.193333
+          ],
+          "CenterMeters": [
+            -0.105151,
+            -0.685461
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            472.5,
+            171.0
+          ],
+          "CenterNorm": [
+            0.299923,
+            0.133333
+          ],
+          "CenterMeters": [
+            -0.223606,
+            -0.819573
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            626.5,
+            167.0
+          ],
+          "CenterNorm": [
+            0.418203,
+            0.127407
+          ],
+          "CenterMeters": [
+            -0.091417,
+            -0.832819
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            690.0,
+            429.0
+          ],
+          "CenterNorm": [
+            0.466974,
+            0.515556
+          ],
+          "CenterMeters": [
+            -0.03691,
+            0.03477
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            274.0,
+            331.0
+          ],
+          "CenterNorm": [
+            0.147465,
+            0.37037
+          ],
+          "CenterMeters": [
+            -0.393993,
+            -0.289748
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            524.5,
+            322.0
+          ],
+          "CenterNorm": [
+            0.339862,
+            0.357037
+          ],
+          "CenterMeters": [
+            -0.178971,
+            -0.319551
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            571.5,
+            265.0
+          ],
+          "CenterNorm": [
+            0.37596,
+            0.272593
+          ],
+          "CenterMeters": [
+            -0.138627,
+            -0.508301
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            370.5,
+            222.0
+          ],
+          "CenterNorm": [
+            0.221582,
+            0.208889
+          ],
+          "CenterMeters": [
+            -0.31116,
+            -0.650692
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            743.5,
+            220.0
+          ],
+          "CenterNorm": [
+            0.508065,
+            0.205926
+          ],
+          "CenterMeters": [
+            0.009013,
+            -0.657314
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            648.0,
+            154.0
+          ],
+          "CenterNorm": [
+            0.434716,
+            0.108148
+          ],
+          "CenterMeters": [
+            -0.072962,
+            -0.875867
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            631.5,
+            172.0
+          ],
+          "CenterNorm": [
+            0.422043,
+            0.134815
+          ],
+          "CenterMeters": [
+            -0.087125,
+            -0.816262
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            707.0,
+            234.0
+          ],
+          "CenterNorm": [
+            0.480031,
+            0.226667
+          ],
+          "CenterMeters": [
+            -0.022318,
+            -0.610955
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            579.0,
+            359.5
+          ],
+          "CenterNorm": [
+            0.38172,
+            0.412593
+          ],
+          "CenterMeters": [
+            -0.132189,
+            -0.195373
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            753.0,
+            315.5
+          ],
+          "CenterNorm": [
+            0.515361,
+            0.347407
+          ],
+          "CenterMeters": [
+            0.017167,
+            -0.341075
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            410.0,
+            263.0
+          ],
+          "CenterNorm": [
+            0.25192,
+            0.26963
+          ],
+          "CenterMeters": [
+            -0.277254,
+            -0.514924
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            661.0,
+            234.0
+          ],
+          "CenterNorm": [
+            0.4447,
+            0.226667
+          ],
+          "CenterMeters": [
+            -0.061803,
+            -0.610955
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            472.5,
+            171.5
+          ],
+          "CenterNorm": [
+            0.299923,
+            0.134074
+          ],
+          "CenterMeters": [
+            -0.223606,
+            -0.817918
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            623.5,
+            164.5
+          ],
+          "CenterNorm": [
+            0.415899,
+            0.123704
+          ],
+          "CenterMeters": [
+            -0.093992,
+            -0.841097
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            690.0,
+            429.5
+          ],
+          "CenterNorm": [
+            0.466974,
+            0.516296
+          ],
+          "CenterMeters": [
+            -0.03691,
+            0.036425
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            273.5,
+            331.0
+          ],
+          "CenterNorm": [
+            0.147081,
+            0.37037
+          ],
+          "CenterMeters": [
+            -0.394422,
+            -0.289748
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            524.5,
+            323.0
+          ],
+          "CenterNorm": [
+            0.339862,
+            0.358519
+          ],
+          "CenterMeters": [
+            -0.178971,
+            -0.316239
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            572.0,
+            265.0
+          ],
+          "CenterNorm": [
+            0.376344,
+            0.272593
+          ],
+          "CenterMeters": [
+            -0.138198,
+            -0.508301
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            370.5,
+            222.0
+          ],
+          "CenterNorm": [
+            0.221582,
+            0.208889
+          ],
+          "CenterMeters": [
+            -0.31116,
+            -0.650692
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            743.5,
+            219.5
+          ],
+          "CenterNorm": [
+            0.508065,
+            0.205185
+          ],
+          "CenterMeters": [
+            0.009013,
+            -0.65897
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            648.0,
+            153.0
+          ],
+          "CenterNorm": [
+            0.434716,
+            0.106667
+          ],
+          "CenterMeters": [
+            -0.072962,
+            -0.879179
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 15,
+        "LastBallCount": 15,
+        "MatchedBallCount": 15,
+        "EstimatedPocketedBallCount": 0,
+        "EstimatedMovedBallCount": 3,
+        "UnmatchedFirstCount": 0,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.143282,
+        "MeanMatchedDisplacementMeters": 0.035784,
+        "MaxMatchedDisplacementMeters": 0.281197,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game1_clip3",
+      "VideoPath": "game1_clip3/game1_clip3.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            588.0,
+            175.0
+          ],
+          "CenterNorm": [
+            0.388633,
+            0.139259
+          ],
+          "CenterMeters": [
+            -0.124464,
+            -0.806328
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            551.5,
+            294.5
+          ],
+          "CenterNorm": [
+            0.360599,
+            0.316296
+          ],
+          "CenterMeters": [
+            -0.155794,
+            -0.410615
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            624.0,
+            242.0
+          ],
+          "CenterNorm": [
+            0.416283,
+            0.238519
+          ],
+          "CenterMeters": [
+            -0.093563,
+            -0.584463
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            319.5,
+            200.0
+          ],
+          "CenterNorm": [
+            0.182412,
+            0.176296
+          ],
+          "CenterMeters": [
+            -0.354937,
+            -0.723543
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            768.5,
+            341.0
+          ],
+          "CenterNorm": [
+            0.527266,
+            0.385185
+          ],
+          "CenterMeters": [
+            0.030472,
+            -0.256634
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            441.0,
+            341.5
+          ],
+          "CenterNorm": [
+            0.27573,
+            0.385926
+          ],
+          "CenterMeters": [
+            -0.250645,
+            -0.254978
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            668.5,
+            249.0
+          ],
+          "CenterNorm": [
+            0.450461,
+            0.248889
+          ],
+          "CenterMeters": [
+            -0.055365,
+            -0.561284
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            317.5,
+            296.0
+          ],
+          "CenterNorm": [
+            0.180876,
+            0.318519
+          ],
+          "CenterMeters": [
+            -0.356653,
+            -0.405647
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            551.5,
+            294.5
+          ],
+          "CenterNorm": [
+            0.360599,
+            0.316296
+          ],
+          "CenterMeters": [
+            -0.155794,
+            -0.410615
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            319.5,
+            199.5
+          ],
+          "CenterNorm": [
+            0.182412,
+            0.175556
+          ],
+          "CenterMeters": [
+            -0.354937,
+            -0.725198
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            768.5,
+            341.0
+          ],
+          "CenterNorm": [
+            0.527266,
+            0.385185
+          ],
+          "CenterMeters": [
+            0.030472,
+            -0.256634
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            441.0,
+            341.0
+          ],
+          "CenterNorm": [
+            0.27573,
+            0.385185
+          ],
+          "CenterMeters": [
+            -0.250645,
+            -0.256634
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            668.5,
+            248.5
+          ],
+          "CenterNorm": [
+            0.450461,
+            0.248148
+          ],
+          "CenterMeters": [
+            -0.055365,
+            -0.562939
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 7,
+        "LastBallCount": 6,
+        "MatchedBallCount": 6,
+        "EstimatedPocketedBallCount": 1,
+        "EstimatedMovedBallCount": 1,
+        "UnmatchedFirstCount": 1,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.463095,
+        "MeanMatchedDisplacementMeters": 0.07801,
+        "MaxMatchedDisplacementMeters": 0.463095,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game1_clip4",
+      "VideoPath": "game1_clip4/game1_clip4.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            359.0,
+            347.0
+          ],
+          "CenterNorm": [
+            0.21275,
+            0.394074
+          ],
+          "CenterMeters": [
+            -0.321031,
+            -0.236766
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            549.0,
+            346.0
+          ],
+          "CenterNorm": [
+            0.358679,
+            0.392593
+          ],
+          "CenterMeters": [
+            -0.15794,
+            -0.240077
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            421.5,
+            395.5
+          ],
+          "CenterNorm": [
+            0.260753,
+            0.465926
+          ],
+          "CenterMeters": [
+            -0.267383,
+            -0.076162
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            460.5,
+            390.5
+          ],
+          "CenterNorm": [
+            0.290707,
+            0.458519
+          ],
+          "CenterMeters": [
+            -0.233906,
+            -0.092719
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            625.0,
+            257.0
+          ],
+          "CenterNorm": [
+            0.417051,
+            0.260741
+          ],
+          "CenterMeters": [
+            -0.092704,
+            -0.534792
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            665.5,
+            231.5
+          ],
+          "CenterNorm": [
+            0.448157,
+            0.222963
+          ],
+          "CenterMeters": [
+            -0.05794,
+            -0.619233
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            576.0,
+            157.0
+          ],
+          "CenterNorm": [
+            0.379416,
+            0.112593
+          ],
+          "CenterMeters": [
+            -0.134764,
+            -0.865933
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            618.0,
+            152.0
+          ],
+          "CenterNorm": [
+            0.411674,
+            0.105185
+          ],
+          "CenterMeters": [
+            -0.098713,
+            -0.88249
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            698.5,
+            304.0
+          ],
+          "CenterNorm": [
+            0.473502,
+            0.33037
+          ],
+          "CenterMeters": [
+            -0.029614,
+            -0.379156
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            603.5,
+            276.5
+          ],
+          "CenterNorm": [
+            0.400538,
+            0.28963
+          ],
+          "CenterMeters": [
+            -0.111159,
+            -0.47022
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            369.0,
+            232.0
+          ],
+          "CenterNorm": [
+            0.22043,
+            0.223704
+          ],
+          "CenterMeters": [
+            -0.312447,
+            -0.617577
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            336.0,
+            185.0
+          ],
+          "CenterNorm": [
+            0.195084,
+            0.154074
+          ],
+          "CenterMeters": [
+            -0.340774,
+            -0.773214
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            557.0,
+            122.5
+          ],
+          "CenterNorm": [
+            0.364823,
+            0.061481
+          ],
+          "CenterMeters": [
+            -0.151073,
+            -0.980177
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            586.0,
+            116.5
+          ],
+          "CenterNorm": [
+            0.387097,
+            0.052593
+          ],
+          "CenterMeters": [
+            -0.126181,
+            -1.000045
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            437.5,
+            373.0
+          ],
+          "CenterNorm": [
+            0.273041,
+            0.432593
+          ],
+          "CenterMeters": [
+            -0.253649,
+            -0.150669
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            549.0,
+            345.5
+          ],
+          "CenterNorm": [
+            0.358679,
+            0.391852
+          ],
+          "CenterMeters": [
+            -0.15794,
+            -0.241733
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            806.5,
+            432.0
+          ],
+          "CenterNorm": [
+            0.556452,
+            0.52
+          ],
+          "CenterMeters": [
+            0.06309,
+            0.044704
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            307.5,
+            313.5
+          ],
+          "CenterNorm": [
+            0.173195,
+            0.344444
+          ],
+          "CenterMeters": [
+            -0.365237,
+            -0.347698
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            625.0,
+            257.0
+          ],
+          "CenterNorm": [
+            0.417051,
+            0.260741
+          ],
+          "CenterMeters": [
+            -0.092704,
+            -0.534792
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            666.0,
+            232.0
+          ],
+          "CenterNorm": [
+            0.448541,
+            0.223704
+          ],
+          "CenterMeters": [
+            -0.057511,
+            -0.617577
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            576.0,
+            157.0
+          ],
+          "CenterNorm": [
+            0.379416,
+            0.112593
+          ],
+          "CenterMeters": [
+            -0.134764,
+            -0.865933
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            618.0,
+            152.0
+          ],
+          "CenterNorm": [
+            0.411674,
+            0.105185
+          ],
+          "CenterMeters": [
+            -0.098713,
+            -0.88249
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            698.5,
+            304.5
+          ],
+          "CenterNorm": [
+            0.473502,
+            0.331111
+          ],
+          "CenterMeters": [
+            -0.029614,
+            -0.3775
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            603.5,
+            276.0
+          ],
+          "CenterNorm": [
+            0.400538,
+            0.288889
+          ],
+          "CenterMeters": [
+            -0.111159,
+            -0.471876
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            369.0,
+            231.5
+          ],
+          "CenterNorm": [
+            0.22043,
+            0.222963
+          ],
+          "CenterMeters": [
+            -0.312447,
+            -0.619233
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            335.5,
+            184.5
+          ],
+          "CenterNorm": [
+            0.1947,
+            0.153333
+          ],
+          "CenterMeters": [
+            -0.341203,
+            -0.774869
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            557.0,
+            122.5
+          ],
+          "CenterNorm": [
+            0.364823,
+            0.061481
+          ],
+          "CenterMeters": [
+            -0.151073,
+            -0.980177
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            585.0,
+            116.5
+          ],
+          "CenterNorm": [
+            0.386329,
+            0.052593
+          ],
+          "CenterMeters": [
+            -0.127039,
+            -1.000045
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 14,
+        "LastBallCount": 14,
+        "MatchedBallCount": 14,
+        "EstimatedPocketedBallCount": 0,
+        "EstimatedMovedBallCount": 3,
+        "UnmatchedFirstCount": 0,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.10933,
+        "MeanMatchedDisplacementMeters": 0.052579,
+        "MaxMatchedDisplacementMeters": 0.327249,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game2_clip1",
+      "VideoPath": "game2_clip1/game2_clip1.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            752.5,
+            271.0
+          ],
+          "CenterNorm": [
+            0.514977,
+            0.281481
+          ],
+          "CenterMeters": [
+            0.016738,
+            -0.488433
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            404.0,
+            300.5
+          ],
+          "CenterNorm": [
+            0.247312,
+            0.325185
+          ],
+          "CenterMeters": [
+            -0.282404,
+            -0.390746
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            835.5,
+            479.0
+          ],
+          "CenterNorm": [
+            0.578725,
+            0.58963
+          ],
+          "CenterMeters": [
+            0.087983,
+            0.20034
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            488.0,
+            470.5
+          ],
+          "CenterNorm": [
+            0.311828,
+            0.577037
+          ],
+          "CenterMeters": [
+            -0.210301,
+            0.172193
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            447.5,
+            222.0
+          ],
+          "CenterNorm": [
+            0.280722,
+            0.208889
+          ],
+          "CenterMeters": [
+            -0.245065,
+            -0.650692
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            339.0,
+            179.5
+          ],
+          "CenterNorm": [
+            0.197389,
+            0.145926
+          ],
+          "CenterMeters": [
+            -0.338198,
+            -0.791426
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            383.0,
+            157.0
+          ],
+          "CenterNorm": [
+            0.231183,
+            0.112593
+          ],
+          "CenterMeters": [
+            -0.30043,
+            -0.865933
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            347.5,
+            124.0
+          ],
+          "CenterNorm": [
+            0.203917,
+            0.063704
+          ],
+          "CenterMeters": [
+            -0.330902,
+            -0.975209
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            387.0,
+            100.0
+          ],
+          "CenterNorm": [
+            0.234255,
+            0.028148
+          ],
+          "CenterMeters": [
+            -0.296997,
+            -1.054683
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            443.5,
+            476.5
+          ],
+          "CenterNorm": [
+            0.27765,
+            0.585926
+          ],
+          "CenterMeters": [
+            -0.248499,
+            0.192062
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            920.0,
+            473.5
+          ],
+          "CenterNorm": [
+            0.643625,
+            0.581481
+          ],
+          "CenterMeters": [
+            0.160516,
+            0.182127
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            736.0,
+            173.0
+          ],
+          "CenterNorm": [
+            0.502304,
+            0.136296
+          ],
+          "CenterMeters": [
+            0.002575,
+            -0.812951
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            368.5,
+            159.5
+          ],
+          "CenterNorm": [
+            0.220046,
+            0.116296
+          ],
+          "CenterMeters": [
+            -0.312876,
+            -0.857655
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            404.0,
+            300.5
+          ],
+          "CenterNorm": [
+            0.247312,
+            0.325185
+          ],
+          "CenterMeters": [
+            -0.282404,
+            -0.390746
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            836.0,
+            479.5
+          ],
+          "CenterNorm": [
+            0.579109,
+            0.59037
+          ],
+          "CenterMeters": [
+            0.088412,
+            0.201996
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            488.0,
+            470.5
+          ],
+          "CenterNorm": [
+            0.311828,
+            0.577037
+          ],
+          "CenterMeters": [
+            -0.210301,
+            0.172193
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            447.5,
+            222.0
+          ],
+          "CenterNorm": [
+            0.280722,
+            0.208889
+          ],
+          "CenterMeters": [
+            -0.245065,
+            -0.650692
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            339.0,
+            179.5
+          ],
+          "CenterNorm": [
+            0.197389,
+            0.145926
+          ],
+          "CenterMeters": [
+            -0.338198,
+            -0.791426
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            373.5,
+            123.5
+          ],
+          "CenterNorm": [
+            0.223886,
+            0.062963
+          ],
+          "CenterMeters": [
+            -0.308585,
+            -0.976865
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            363.0,
+            110.0
+          ],
+          "CenterNorm": [
+            0.215822,
+            0.042963
+          ],
+          "CenterMeters": [
+            -0.317598,
+            -1.021569
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            386.5,
+            99.0
+          ],
+          "CenterNorm": [
+            0.233871,
+            0.026667
+          ],
+          "CenterMeters": [
+            -0.297426,
+            -1.057995
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            443.5,
+            476.5
+          ],
+          "CenterNorm": [
+            0.27765,
+            0.585926
+          ],
+          "CenterMeters": [
+            -0.248499,
+            0.192062
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            920.0,
+            474.0
+          ],
+          "CenterNorm": [
+            0.643625,
+            0.582222
+          ],
+          "CenterMeters": [
+            0.160516,
+            0.183783
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            735.5,
+            173.5
+          ],
+          "CenterNorm": [
+            0.50192,
+            0.137037
+          ],
+          "CenterMeters": [
+            0.002146,
+            -0.811295
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 12,
+        "LastBallCount": 12,
+        "MatchedBallCount": 12,
+        "EstimatedPocketedBallCount": 0,
+        "EstimatedMovedBallCount": 2,
+        "UnmatchedFirstCount": 0,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.494945,
+        "MeanMatchedDisplacementMeters": 0.05686,
+        "MaxMatchedDisplacementMeters": 0.494945,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game2_clip2",
+      "VideoPath": "game2_clip2/game2_clip2.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            536.0,
+            128.0
+          ],
+          "CenterNorm": [
+            0.348694,
+            0.06963
+          ],
+          "CenterMeters": [
+            -0.169099,
+            -0.961964
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            356.0,
+            239.5
+          ],
+          "CenterNorm": [
+            0.210445,
+            0.234815
+          ],
+          "CenterMeters": [
+            -0.323606,
+            -0.592742
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            770.0,
+            305.0
+          ],
+          "CenterNorm": [
+            0.528418,
+            0.331852
+          ],
+          "CenterMeters": [
+            0.03176,
+            -0.375845
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            281.0,
+            266.5
+          ],
+          "CenterNorm": [
+            0.152842,
+            0.274815
+          ],
+          "CenterMeters": [
+            -0.387984,
+            -0.503334
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            352.0,
+            206.0
+          ],
+          "CenterNorm": [
+            0.207373,
+            0.185185
+          ],
+          "CenterMeters": [
+            -0.32704,
+            -0.703674
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            433.5,
+            198.5
+          ],
+          "CenterNorm": [
+            0.269969,
+            0.174074
+          ],
+          "CenterMeters": [
+            -0.257082,
+            -0.72851
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            586.5,
+            109.0
+          ],
+          "CenterNorm": [
+            0.387481,
+            0.041481
+          ],
+          "CenterMeters": [
+            -0.125751,
+            -1.024881
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            777.0,
+            432.5
+          ],
+          "CenterNorm": [
+            0.533794,
+            0.520741
+          ],
+          "CenterMeters": [
+            0.037768,
+            0.04636
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            351.0,
+            364.5
+          ],
+          "CenterNorm": [
+            0.206605,
+            0.42
+          ],
+          "CenterMeters": [
+            -0.327898,
+            -0.178816
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            720.5,
+            306.0
+          ],
+          "CenterNorm": [
+            0.490399,
+            0.333333
+          ],
+          "CenterMeters": [
+            -0.01073,
+            -0.372533
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            744.5,
+            250.5
+          ],
+          "CenterNorm": [
+            0.508833,
+            0.251111
+          ],
+          "CenterMeters": [
+            0.009871,
+            -0.556316
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            688.0,
+            181.0
+          ],
+          "CenterNorm": [
+            0.465438,
+            0.148148
+          ],
+          "CenterMeters": [
+            -0.038627,
+            -0.786459
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            337.0,
+            154.0
+          ],
+          "CenterNorm": [
+            0.195853,
+            0.108148
+          ],
+          "CenterMeters": [
+            -0.339915,
+            -0.875867
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            816.5,
+            321.0
+          ],
+          "CenterNorm": [
+            0.564132,
+            0.355556
+          ],
+          "CenterMeters": [
+            0.071674,
+            -0.322862
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            433.0,
+            198.5
+          ],
+          "CenterNorm": [
+            0.269585,
+            0.174074
+          ],
+          "CenterMeters": [
+            -0.257512,
+            -0.72851
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            281.0,
+            266.5
+          ],
+          "CenterNorm": [
+            0.152842,
+            0.274815
+          ],
+          "CenterMeters": [
+            -0.387984,
+            -0.503334
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            356.0,
+            239.0
+          ],
+          "CenterNorm": [
+            0.210445,
+            0.234074
+          ],
+          "CenterMeters": [
+            -0.323606,
+            -0.594398
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            351.5,
+            206.0
+          ],
+          "CenterNorm": [
+            0.206989,
+            0.185185
+          ],
+          "CenterMeters": [
+            -0.327469,
+            -0.703674
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            586.5,
+            109.0
+          ],
+          "CenterNorm": [
+            0.387481,
+            0.041481
+          ],
+          "CenterMeters": [
+            -0.125751,
+            -1.024881
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            777.0,
+            432.5
+          ],
+          "CenterNorm": [
+            0.533794,
+            0.520741
+          ],
+          "CenterMeters": [
+            0.037768,
+            0.04636
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            351.0,
+            364.0
+          ],
+          "CenterNorm": [
+            0.206605,
+            0.419259
+          ],
+          "CenterMeters": [
+            -0.327898,
+            -0.180472
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            720.5,
+            306.0
+          ],
+          "CenterNorm": [
+            0.490399,
+            0.333333
+          ],
+          "CenterMeters": [
+            -0.01073,
+            -0.372533
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            744.5,
+            250.5
+          ],
+          "CenterNorm": [
+            0.508833,
+            0.251111
+          ],
+          "CenterMeters": [
+            0.009871,
+            -0.556316
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            688.5,
+            180.5
+          ],
+          "CenterNorm": [
+            0.465822,
+            0.147407
+          ],
+          "CenterMeters": [
+            -0.038198,
+            -0.788115
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            337.0,
+            153.0
+          ],
+          "CenterNorm": [
+            0.195853,
+            0.106667
+          ],
+          "CenterMeters": [
+            -0.339915,
+            -0.879179
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 13,
+        "LastBallCount": 12,
+        "MatchedBallCount": 12,
+        "EstimatedPocketedBallCount": 1,
+        "EstimatedMovedBallCount": 3,
+        "UnmatchedFirstCount": 1,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.682952,
+        "MeanMatchedDisplacementMeters": 0.082564,
+        "MaxMatchedDisplacementMeters": 0.682952,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game3_clip1",
+      "VideoPath": "game3_clip1/game3_clip1.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            579.5,
+            169.5
+          ],
+          "CenterNorm": [
+            0.382104,
+            0.131111
+          ],
+          "CenterMeters": [
+            -0.13176,
+            -0.82454
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            613.5,
+            258.5
+          ],
+          "CenterNorm": [
+            0.408218,
+            0.262963
+          ],
+          "CenterMeters": [
+            -0.102575,
+            -0.529825
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            530.0,
+            360.5
+          ],
+          "CenterNorm": [
+            0.344086,
+            0.414074
+          ],
+          "CenterMeters": [
+            -0.174249,
+            -0.192062
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            389.0,
+            327.5
+          ],
+          "CenterNorm": [
+            0.235791,
+            0.365185
+          ],
+          "CenterMeters": [
+            -0.29528,
+            -0.301338
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            398.0,
+            228.5
+          ],
+          "CenterNorm": [
+            0.242704,
+            0.218519
+          ],
+          "CenterMeters": [
+            -0.287555,
+            -0.629167
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            417.5,
+            334.0
+          ],
+          "CenterNorm": [
+            0.25768,
+            0.374815
+          ],
+          "CenterMeters": [
+            -0.270816,
+            -0.279814
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            749.5,
+            287.5
+          ],
+          "CenterNorm": [
+            0.512673,
+            0.305926
+          ],
+          "CenterMeters": [
+            0.014163,
+            -0.433794
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            705.0,
+            274.0
+          ],
+          "CenterNorm": [
+            0.478495,
+            0.285926
+          ],
+          "CenterMeters": [
+            -0.024034,
+            -0.478498
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            456.5,
+            249.0
+          ],
+          "CenterNorm": [
+            0.287634,
+            0.248889
+          ],
+          "CenterMeters": [
+            -0.23734,
+            -0.561284
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            466.0,
+            318.0
+          ],
+          "CenterNorm": [
+            0.294931,
+            0.351111
+          ],
+          "CenterMeters": [
+            -0.229185,
+            -0.332796
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            613.5,
+            258.5
+          ],
+          "CenterNorm": [
+            0.408218,
+            0.262963
+          ],
+          "CenterMeters": [
+            -0.102575,
+            -0.529825
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            530.5,
+            359.5
+          ],
+          "CenterNorm": [
+            0.34447,
+            0.412593
+          ],
+          "CenterMeters": [
+            -0.17382,
+            -0.195373
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            389.0,
+            327.5
+          ],
+          "CenterNorm": [
+            0.235791,
+            0.365185
+          ],
+          "CenterMeters": [
+            -0.29528,
+            -0.301338
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            417.5,
+            333.5
+          ],
+          "CenterNorm": [
+            0.25768,
+            0.374074
+          ],
+          "CenterMeters": [
+            -0.270816,
+            -0.28147
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            749.5,
+            287.5
+          ],
+          "CenterNorm": [
+            0.512673,
+            0.305926
+          ],
+          "CenterMeters": [
+            0.014163,
+            -0.433794
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            705.0,
+            275.5
+          ],
+          "CenterNorm": [
+            0.478495,
+            0.288148
+          ],
+          "CenterMeters": [
+            -0.024034,
+            -0.473531
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            456.5,
+            248.5
+          ],
+          "CenterNorm": [
+            0.287634,
+            0.248148
+          ],
+          "CenterMeters": [
+            -0.23734,
+            -0.562939
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 9,
+        "LastBallCount": 8,
+        "MatchedBallCount": 8,
+        "EstimatedPocketedBallCount": 1,
+        "EstimatedMovedBallCount": 2,
+        "UnmatchedFirstCount": 1,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.501302,
+        "MeanMatchedDisplacementMeters": 0.119755,
+        "MaxMatchedDisplacementMeters": 0.501302,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game3_clip2",
+      "VideoPath": "game3_clip2/game3_clip2.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            706.0,
+            255.0
+          ],
+          "CenterNorm": [
+            0.479263,
+            0.257778
+          ],
+          "CenterMeters": [
+            -0.023176,
+            -0.541415
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            456.5,
+            291.0
+          ],
+          "CenterNorm": [
+            0.287634,
+            0.311111
+          ],
+          "CenterMeters": [
+            -0.23734,
+            -0.422204
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            462.5,
+            340.0
+          ],
+          "CenterNorm": [
+            0.292243,
+            0.383704
+          ],
+          "CenterMeters": [
+            -0.23219,
+            -0.259945
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            549.0,
+            288.0
+          ],
+          "CenterNorm": [
+            0.358679,
+            0.306667
+          ],
+          "CenterMeters": [
+            -0.15794,
+            -0.432139
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            548.5,
+            232.0
+          ],
+          "CenterNorm": [
+            0.358295,
+            0.223704
+          ],
+          "CenterMeters": [
+            -0.15837,
+            -0.617577
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            350.0,
+            369.0
+          ],
+          "CenterNorm": [
+            0.205837,
+            0.426667
+          ],
+          "CenterMeters": [
+            -0.328756,
+            -0.163915
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            290.5,
+            340.5
+          ],
+          "CenterNorm": [
+            0.160138,
+            0.384444
+          ],
+          "CenterMeters": [
+            -0.379829,
+            -0.25829
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            457.5,
+            319.5
+          ],
+          "CenterNorm": [
+            0.288402,
+            0.353333
+          ],
+          "CenterMeters": [
+            -0.236481,
+            -0.327829
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            512.5,
+            188.5
+          ],
+          "CenterNorm": [
+            0.330645,
+            0.159259
+          ],
+          "CenterMeters": [
+            -0.189271,
+            -0.761624
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            851.0,
+            165.5
+          ],
+          "CenterNorm": [
+            0.59063,
+            0.125185
+          ],
+          "CenterMeters": [
+            0.101288,
+            -0.837786
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            548.5,
+            130.5
+          ],
+          "CenterNorm": [
+            0.358295,
+            0.073333
+          ],
+          "CenterMeters": [
+            -0.15837,
+            -0.953685
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            333.5,
+            289.0
+          ],
+          "CenterNorm": [
+            0.193164,
+            0.308148
+          ],
+          "CenterMeters": [
+            -0.34292,
+            -0.428827
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            456.5,
+            291.0
+          ],
+          "CenterNorm": [
+            0.287634,
+            0.311111
+          ],
+          "CenterMeters": [
+            -0.23734,
+            -0.422204
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            462.5,
+            339.5
+          ],
+          "CenterNorm": [
+            0.292243,
+            0.382963
+          ],
+          "CenterMeters": [
+            -0.23219,
+            -0.261601
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            549.0,
+            288.0
+          ],
+          "CenterNorm": [
+            0.358679,
+            0.306667
+          ],
+          "CenterMeters": [
+            -0.15794,
+            -0.432139
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            350.0,
+            369.0
+          ],
+          "CenterNorm": [
+            0.205837,
+            0.426667
+          ],
+          "CenterMeters": [
+            -0.328756,
+            -0.163915
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            290.5,
+            340.0
+          ],
+          "CenterNorm": [
+            0.160138,
+            0.383704
+          ],
+          "CenterMeters": [
+            -0.379829,
+            -0.259945
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            457.5,
+            320.0
+          ],
+          "CenterNorm": [
+            0.288402,
+            0.354074
+          ],
+          "CenterMeters": [
+            -0.236481,
+            -0.326174
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            513.0,
+            188.5
+          ],
+          "CenterNorm": [
+            0.331029,
+            0.159259
+          ],
+          "CenterMeters": [
+            -0.188842,
+            -0.761624
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            851.0,
+            164.5
+          ],
+          "CenterNorm": [
+            0.59063,
+            0.123704
+          ],
+          "CenterMeters": [
+            0.101288,
+            -0.841097
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            548.0,
+            130.5
+          ],
+          "CenterNorm": [
+            0.357911,
+            0.073333
+          ],
+          "CenterMeters": [
+            -0.158799,
+            -0.953685
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 11,
+        "LastBallCount": 10,
+        "MatchedBallCount": 10,
+        "EstimatedPocketedBallCount": 1,
+        "EstimatedMovedBallCount": 2,
+        "UnmatchedFirstCount": 1,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.338987,
+        "MeanMatchedDisplacementMeters": 0.053356,
+        "MaxMatchedDisplacementMeters": 0.338987,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game4_clip1",
+      "VideoPath": "game4_clip1/game4_clip1.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            370.5,
+            293.0
+          ],
+          "CenterNorm": [
+            0.221582,
+            0.314074
+          ],
+          "CenterMeters": [
+            -0.31116,
+            -0.415582
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            465.5,
+            280.0
+          ],
+          "CenterNorm": [
+            0.294547,
+            0.294815
+          ],
+          "CenterMeters": [
+            -0.229614,
+            -0.45863
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            552.5,
+            337.5
+          ],
+          "CenterNorm": [
+            0.361367,
+            0.38
+          ],
+          "CenterMeters": [
+            -0.154936,
+            -0.268224
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            723.5,
+            369.5
+          ],
+          "CenterNorm": [
+            0.492704,
+            0.427407
+          ],
+          "CenterMeters": [
+            -0.008155,
+            -0.162259
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            360.5,
+            357.5
+          ],
+          "CenterNorm": [
+            0.213902,
+            0.40963
+          ],
+          "CenterMeters": [
+            -0.319743,
+            -0.201996
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            478.5,
+            346.0
+          ],
+          "CenterNorm": [
+            0.304531,
+            0.392593
+          ],
+          "CenterMeters": [
+            -0.218456,
+            -0.240077
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            642.0,
+            265.0
+          ],
+          "CenterNorm": [
+            0.430108,
+            0.272593
+          ],
+          "CenterMeters": [
+            -0.078112,
+            -0.508301
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            629.0,
+            99.0
+          ],
+          "CenterNorm": [
+            0.420123,
+            0.026667
+          ],
+          "CenterMeters": [
+            -0.089271,
+            -1.057995
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            647.5,
+            59.0
+          ],
+          "CenterNorm": [
+            0.434332,
+            0.0
+          ],
+          "CenterMeters": [
+            -0.073391,
+            -1.1176
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            311.0,
+            302.0
+          ],
+          "CenterNorm": [
+            0.175883,
+            0.327407
+          ],
+          "CenterMeters": [
+            -0.362233,
+            -0.385779
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            465.5,
+            280.0
+          ],
+          "CenterNorm": [
+            0.294547,
+            0.294815
+          ],
+          "CenterMeters": [
+            -0.229614,
+            -0.45863
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            723.5,
+            370.0
+          ],
+          "CenterNorm": [
+            0.492704,
+            0.428148
+          ],
+          "CenterMeters": [
+            -0.008155,
+            -0.160603
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            360.5,
+            357.5
+          ],
+          "CenterNorm": [
+            0.213902,
+            0.40963
+          ],
+          "CenterMeters": [
+            -0.319743,
+            -0.201996
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            478.5,
+            345.0
+          ],
+          "CenterNorm": [
+            0.304531,
+            0.391111
+          ],
+          "CenterMeters": [
+            -0.218456,
+            -0.243388
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            641.5,
+            265.0
+          ],
+          "CenterNorm": [
+            0.429724,
+            0.272593
+          ],
+          "CenterMeters": [
+            -0.078541,
+            -0.508301
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            628.5,
+            98.5
+          ],
+          "CenterNorm": [
+            0.419739,
+            0.025926
+          ],
+          "CenterMeters": [
+            -0.0897,
+            -1.05965
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            645.5,
+            59.0
+          ],
+          "CenterNorm": [
+            0.432796,
+            0.0
+          ],
+          "CenterMeters": [
+            -0.075108,
+            -1.1176
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 9,
+        "LastBallCount": 8,
+        "MatchedBallCount": 8,
+        "EstimatedPocketedBallCount": 1,
+        "EstimatedMovedBallCount": 1,
+        "UnmatchedFirstCount": 1,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.059133,
+        "MeanMatchedDisplacementMeters": 0.008494,
+        "MaxMatchedDisplacementMeters": 0.059133,
+        "MoveThresholdMeters": 0.03
+      }
+    },
+    {
+      "ClipId": "game4_clip2",
+      "VideoPath": "game4_clip2/game4_clip2.mp4",
+      "FirstBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            475.0,
+            246.5
+          ],
+          "CenterNorm": [
+            0.301843,
+            0.245185
+          ],
+          "CenterMeters": [
+            -0.22146,
+            -0.569562
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            549.5,
+            338.5
+          ],
+          "CenterNorm": [
+            0.359063,
+            0.381481
+          ],
+          "CenterMeters": [
+            -0.157511,
+            -0.264913
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            706.5,
+            263.0
+          ],
+          "CenterNorm": [
+            0.479647,
+            0.26963
+          ],
+          "CenterMeters": [
+            -0.022747,
+            -0.514924
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            643.0,
+            244.5
+          ],
+          "CenterNorm": [
+            0.430876,
+            0.242222
+          ],
+          "CenterMeters": [
+            -0.077253,
+            -0.576185
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            487.5,
+            217.5
+          ],
+          "CenterNorm": [
+            0.311444,
+            0.202222
+          ],
+          "CenterMeters": [
+            -0.21073,
+            -0.665593
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            488.5,
+            137.0
+          ],
+          "CenterNorm": [
+            0.312212,
+            0.082963
+          ],
+          "CenterMeters": [
+            -0.209872,
+            -0.932161
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            568.0,
+            122.5
+          ],
+          "CenterNorm": [
+            0.373272,
+            0.061481
+          ],
+          "CenterMeters": [
+            -0.141631,
+            -0.980177
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            461.0,
+            109.5
+          ],
+          "CenterNorm": [
+            0.291091,
+            0.042222
+          ],
+          "CenterMeters": [
+            -0.233477,
+            -1.023225
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            566.5,
+            59.5
+          ],
+          "CenterNorm": [
+            0.37212,
+            0.0
+          ],
+          "CenterMeters": [
+            -0.142919,
+            -1.1176
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            731.0,
+            356.0
+          ],
+          "CenterNorm": [
+            0.498464,
+            0.407407
+          ],
+          "CenterMeters": [
+            -0.001717,
+            -0.206963
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            537.5,
+            314.0
+          ],
+          "CenterNorm": [
+            0.349846,
+            0.345185
+          ],
+          "CenterMeters": [
+            -0.167812,
+            -0.346042
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            707.5,
+            299.0
+          ],
+          "CenterNorm": [
+            0.480415,
+            0.322963
+          ],
+          "CenterMeters": [
+            -0.021888,
+            -0.395713
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            626.0,
+            179.0
+          ],
+          "CenterNorm": [
+            0.417819,
+            0.145185
+          ],
+          "CenterMeters": [
+            -0.091846,
+            -0.793082
+          ]
+        }
+      ],
+      "LastBalls": [
+        {
+          "CategoryId": 1,
+          "CategoryName": "CueBall",
+          "CenterPx": [
+            505.0,
+            276.5
+          ],
+          "CenterNorm": [
+            0.324885,
+            0.28963
+          ],
+          "CenterMeters": [
+            -0.195709,
+            -0.47022
+          ]
+        },
+        {
+          "CategoryId": 2,
+          "CategoryName": "EightBall",
+          "CenterPx": [
+            549.5,
+            338.5
+          ],
+          "CenterNorm": [
+            0.359063,
+            0.381481
+          ],
+          "CenterMeters": [
+            -0.157511,
+            -0.264913
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            706.0,
+            262.5
+          ],
+          "CenterNorm": [
+            0.479263,
+            0.268889
+          ],
+          "CenterMeters": [
+            -0.023176,
+            -0.51658
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            643.0,
+            244.5
+          ],
+          "CenterNorm": [
+            0.430876,
+            0.242222
+          ],
+          "CenterMeters": [
+            -0.077253,
+            -0.576185
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            487.5,
+            217.5
+          ],
+          "CenterNorm": [
+            0.311444,
+            0.202222
+          ],
+          "CenterMeters": [
+            -0.21073,
+            -0.665593
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            489.0,
+            136.5
+          ],
+          "CenterNorm": [
+            0.312596,
+            0.082222
+          ],
+          "CenterMeters": [
+            -0.209443,
+            -0.933817
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            568.0,
+            122.5
+          ],
+          "CenterNorm": [
+            0.373272,
+            0.061481
+          ],
+          "CenterMeters": [
+            -0.141631,
+            -0.980177
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            461.0,
+            109.5
+          ],
+          "CenterNorm": [
+            0.291091,
+            0.042222
+          ],
+          "CenterMeters": [
+            -0.233477,
+            -1.023225
+          ]
+        },
+        {
+          "CategoryId": 3,
+          "CategoryName": "Solid",
+          "CenterPx": [
+            567.0,
+            59.5
+          ],
+          "CenterNorm": [
+            0.372504,
+            0.0
+          ],
+          "CenterMeters": [
+            -0.14249,
+            -1.1176
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            537.0,
+            314.5
+          ],
+          "CenterNorm": [
+            0.349462,
+            0.345926
+          ],
+          "CenterMeters": [
+            -0.168241,
+            -0.344386
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            708.0,
+            299.0
+          ],
+          "CenterNorm": [
+            0.480799,
+            0.322963
+          ],
+          "CenterMeters": [
+            -0.021459,
+            -0.395713
+          ]
+        },
+        {
+          "CategoryId": 4,
+          "CategoryName": "Stripe",
+          "CenterPx": [
+            626.0,
+            179.0
+          ],
+          "CenterNorm": [
+            0.417819,
+            0.145185
+          ],
+          "CenterMeters": [
+            -0.091846,
+            -0.793082
+          ]
+        }
+      ],
+      "DerivedMetrics": {
+        "FirstBallCount": 13,
+        "LastBallCount": 12,
+        "MatchedBallCount": 12,
+        "EstimatedPocketedBallCount": 1,
+        "EstimatedMovedBallCount": 1,
+        "UnmatchedFirstCount": 1,
+        "UnmatchedLastCount": 0,
+        "CueBallDisplacementMeters": 0.102625,
+        "MeanMatchedDisplacementMeters": 0.009051,
+        "MaxMatchedDisplacementMeters": 0.102625,
+        "MoveThresholdMeters": 0.03
+      }
+    }
+  ]
+}

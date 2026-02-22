@@ -12,6 +12,15 @@ const double MaxSettleErrorSeconds = 0.25;
 const double DeterminismEpsilon = 1e-10;
 
 RunnerOptions options = RunnerOptions.Parse(args);
+
+if (options.OnlineReferenceReportMode)
+{
+    string packPath = ResolveOnlineReferencePackPath(options.OnlineReferencePackPath);
+    string reportPath = ResolveOnlineReferenceReportPath(options.OnlineReferenceReportPath);
+    int code = RunOnlineReferenceReport(packPath, reportPath);
+    Environment.Exit(code);
+}
+
 string normalizedProfilePreset = NormalizeProfilePreset(options.ProfilePreset);
 string fixturesPath = ResolveFixturePath(options.FixturePath);
 
@@ -674,6 +683,115 @@ static int RunValidationReport(
     }
 
     return physicsFailed == 0 ? 0 : 1;
+}
+
+static int RunOnlineReferenceReport(string packPath, string reportPath)
+{
+    string fullPackPath = Path.GetFullPath(packPath);
+    if (!File.Exists(fullPackPath))
+    {
+        Console.Error.WriteLine($"Online reference pack not found: {fullPackPath}");
+        return 2;
+    }
+
+    OnlineReferencePack? pack = JsonSerializer.Deserialize<OnlineReferencePack>(
+        File.ReadAllText(fullPackPath),
+        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+    if (pack is null || pack.Clips is null || pack.Clips.Length == 0)
+    {
+        Console.Error.WriteLine($"Online reference pack is empty: {fullPackPath}");
+        return 2;
+    }
+
+    int clipCount = pack.Clips.Length;
+    int totalFirst = 0;
+    int totalLast = 0;
+    int totalMoved = 0;
+    int totalPocketed = 0;
+    int cueSamples = 0;
+    double cueDispSum = 0.0;
+    double maxCueDisp = 0.0;
+    string maxCueClip = "n/a";
+
+    for (int i = 0; i < pack.Clips.Length; i++)
+    {
+        OnlineReferenceMetrics metrics = pack.Clips[i].DerivedMetrics ?? new OnlineReferenceMetrics();
+        totalFirst += metrics.FirstBallCount;
+        totalLast += metrics.LastBallCount;
+        totalMoved += metrics.EstimatedMovedBallCount;
+        totalPocketed += metrics.EstimatedPocketedBallCount;
+
+        if (metrics.CueBallDisplacementMeters >= 0.0)
+        {
+            cueSamples++;
+            cueDispSum += metrics.CueBallDisplacementMeters;
+            if (metrics.CueBallDisplacementMeters > maxCueDisp)
+            {
+                maxCueDisp = metrics.CueBallDisplacementMeters;
+                maxCueClip = pack.Clips[i].ClipId;
+            }
+        }
+    }
+
+    double avgFirst = clipCount > 0 ? (double)totalFirst / clipCount : 0.0;
+    double avgLast = clipCount > 0 ? (double)totalLast / clipCount : 0.0;
+    double avgMoved = clipCount > 0 ? (double)totalMoved / clipCount : 0.0;
+    double avgPocketed = clipCount > 0 ? (double)totalPocketed / clipCount : 0.0;
+    double avgCueDisp = cueSamples > 0 ? cueDispSum / cueSamples : 0.0;
+
+    StringBuilder md = new();
+    md.AppendLine("# Online Reference Report");
+    md.AppendLine();
+    md.AppendLine($"- Generated (UTC): `{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)} UTC`");
+    md.AppendLine($"- Pack path: `{fullPackPath}`");
+    md.AppendLine($"- Pack generated at (UTC): `{pack.GeneratedAtUtc}`");
+    md.AppendLine($"- Source: `{pack.Source?.Name ?? "unknown"}`");
+    md.AppendLine($"- Source repository: `{pack.Source?.Repository ?? "unknown"}`");
+    md.AppendLine($"- Source commit: `{pack.Source?.RepositoryCommit ?? "unknown"}`");
+    md.AppendLine($"- Source license: `{pack.Source?.DatasetLicense ?? "unknown"}`");
+    md.AppendLine($"- Clips: `{clipCount}`");
+    md.AppendLine($"- Avg first-frame balls: `{avgFirst.ToString("F2", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Avg last-frame balls: `{avgLast.ToString("F2", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Avg moved-ball estimate: `{avgMoved.ToString("F2", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Avg pocketed-ball estimate: `{avgPocketed.ToString("F2", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Cue displacement samples: `{cueSamples}/{clipCount}`");
+    md.AppendLine($"- Avg cue displacement (m): `{avgCueDisp.ToString("F4", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Max cue displacement (m): `{maxCueDisp.ToString("F4", CultureInfo.InvariantCulture)} ({maxCueClip})`");
+    md.AppendLine();
+    md.AppendLine("| Clip | First Balls | Last Balls | Matched | Moved Est | Pocketed Est | Cue Disp (m) | Max Disp (m) |");
+    md.AppendLine("|---|---:|---:|---:|---:|---:|---:|---:|");
+
+    for (int i = 0; i < pack.Clips.Length; i++)
+    {
+        OnlineReferenceClip clip = pack.Clips[i];
+        OnlineReferenceMetrics metrics = clip.DerivedMetrics ?? new OnlineReferenceMetrics();
+        string cueDisp = metrics.CueBallDisplacementMeters < 0.0
+            ? "n/a"
+            : metrics.CueBallDisplacementMeters.ToString("F4", CultureInfo.InvariantCulture);
+
+        md.AppendLine(
+            $"| `{clip.ClipId}` | {metrics.FirstBallCount} | {metrics.LastBallCount} | {metrics.MatchedBallCount} | " +
+            $"{metrics.EstimatedMovedBallCount} | {metrics.EstimatedPocketedBallCount} | {cueDisp} | " +
+            $"{metrics.MaxMatchedDisplacementMeters.ToString("F4", CultureInfo.InvariantCulture)} |");
+    }
+
+    md.AppendLine();
+    md.AppendLine("## Notes");
+    md.AppendLine("- This report summarizes coarse first/last-frame reference metrics from online clips.");
+    md.AppendLine("- These metrics are not direct shot-fixture pass/fail gates yet.");
+    md.AppendLine("- Source licensing is recorded from pack metadata and should be validated before redistribution.");
+
+    string fullReportPath = Path.GetFullPath(reportPath);
+    string? reportDir = Path.GetDirectoryName(fullReportPath);
+    if (!string.IsNullOrWhiteSpace(reportDir))
+    {
+        Directory.CreateDirectory(reportDir);
+    }
+
+    File.WriteAllText(fullReportPath, md.ToString());
+    Console.WriteLine($"Online reference report written to {fullReportPath}");
+    return 0;
 }
 
 static PresetValidationSummary EvaluatePresetValidation(ShotFixture[] fixtures, string preset)
@@ -1712,6 +1830,38 @@ static string ResolveValidationReportPath(string? argPath)
     return Path.Combine(Environment.CurrentDirectory, "VALIDATION_REPORT.md");
 }
 
+static string ResolveOnlineReferencePackPath(string? argPath)
+{
+    if (!string.IsNullOrWhiteSpace(argPath))
+    {
+        return Path.GetFullPath(argPath);
+    }
+
+    string? repoRoot = TryFindRepositoryRoot();
+    if (!string.IsNullOrWhiteSpace(repoRoot))
+    {
+        return Path.Combine(repoRoot, "tests", "ShotSuiteRunner", "fixtures", "online_reference_pack.json");
+    }
+
+    return Path.Combine(Environment.CurrentDirectory, "online_reference_pack.json");
+}
+
+static string ResolveOnlineReferenceReportPath(string? argPath)
+{
+    if (!string.IsNullOrWhiteSpace(argPath))
+    {
+        return Path.GetFullPath(argPath);
+    }
+
+    string? repoRoot = TryFindRepositoryRoot();
+    if (!string.IsNullOrWhiteSpace(repoRoot))
+    {
+        return Path.Combine(repoRoot, "docs", "ONLINE_REFERENCE_REPORT.md");
+    }
+
+    return Path.Combine(Environment.CurrentDirectory, "ONLINE_REFERENCE_REPORT.md");
+}
+
 static string? TryFindRepositoryRoot()
 {
     string[] startPaths = { Environment.CurrentDirectory, AppContext.BaseDirectory };
@@ -1942,12 +2092,72 @@ internal sealed class PresetValidationSummary
     }
 }
 
+internal sealed class OnlineReferencePack
+{
+    public OnlineReferenceSource? Source { get; set; }
+    public string GeneratedAtUtc { get; set; } = string.Empty;
+    public OnlineReferenceTable? Table { get; set; }
+    public OnlineReferenceClip[] Clips { get; set; } = Array.Empty<OnlineReferenceClip>();
+}
+
+internal sealed class OnlineReferenceSource
+{
+    public string Name { get; set; } = string.Empty;
+    public string Repository { get; set; } = string.Empty;
+    public string RepositoryCommit { get; set; } = string.Empty;
+    public string DatasetPath { get; set; } = string.Empty;
+    public string DatasetLicense { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+}
+
+internal sealed class OnlineReferenceTable
+{
+    public double PlayfieldWidthMeters { get; set; }
+    public double PlayfieldLengthMeters { get; set; }
+    public double[][] TableCornersPx { get; set; } = Array.Empty<double[]>();
+    public string[] CornerOrder { get; set; } = Array.Empty<string>();
+}
+
+internal sealed class OnlineReferenceClip
+{
+    public string ClipId { get; set; } = string.Empty;
+    public string VideoPath { get; set; } = string.Empty;
+    public OnlineReferenceBallObservation[] FirstBalls { get; set; } = Array.Empty<OnlineReferenceBallObservation>();
+    public OnlineReferenceBallObservation[] LastBalls { get; set; } = Array.Empty<OnlineReferenceBallObservation>();
+    public OnlineReferenceMetrics? DerivedMetrics { get; set; }
+}
+
+internal sealed class OnlineReferenceBallObservation
+{
+    public int CategoryId { get; set; }
+    public string CategoryName { get; set; } = string.Empty;
+    public double[] CenterPx { get; set; } = new double[2];
+    public double[] CenterNorm { get; set; } = new double[2];
+    public double[] CenterMeters { get; set; } = new double[2];
+}
+
+internal sealed class OnlineReferenceMetrics
+{
+    public int FirstBallCount { get; set; }
+    public int LastBallCount { get; set; }
+    public int MatchedBallCount { get; set; }
+    public int EstimatedPocketedBallCount { get; set; }
+    public int EstimatedMovedBallCount { get; set; }
+    public int UnmatchedFirstCount { get; set; }
+    public int UnmatchedLastCount { get; set; }
+    public double CueBallDisplacementMeters { get; set; } = -1.0;
+    public double MeanMatchedDisplacementMeters { get; set; }
+    public double MaxMatchedDisplacementMeters { get; set; }
+    public double MoveThresholdMeters { get; set; }
+}
+
 internal sealed class RunnerOptions
 {
     public bool RecordMode { get; private set; }
     public bool AnalyzeMode { get; private set; }
     public bool SanityMode { get; private set; }
     public bool ValidationReportMode { get; private set; }
+    public bool OnlineReferenceReportMode { get; private set; }
     public int DeterminismRepeats { get; private set; }
     public int StressShots { get; private set; }
     public int BenchmarkShots { get; private set; }
@@ -1963,6 +2173,8 @@ internal sealed class RunnerOptions
     public string? FixturePath { get; private set; }
     public string? BenchmarkReportPath { get; private set; }
     public string? ValidationReportPath { get; private set; }
+    public string? OnlineReferencePackPath { get; private set; }
+    public string? OnlineReferenceReportPath { get; private set; }
 
     public static RunnerOptions Parse(string[] args)
     {
@@ -1987,6 +2199,10 @@ internal sealed class RunnerOptions
 
                 case "--validation-report":
                     options.ValidationReportMode = true;
+                    break;
+
+                case "--online-reference-report":
+                    options.OnlineReferenceReportMode = true;
                     break;
 
                 case "--determinism":
@@ -2048,6 +2264,20 @@ internal sealed class RunnerOptions
                     if (i + 1 < args.Length)
                     {
                         options.ValidationReportPath = args[++i];
+                    }
+                    break;
+
+                case "--online-reference-pack":
+                    if (i + 1 < args.Length)
+                    {
+                        options.OnlineReferencePackPath = args[++i];
+                    }
+                    break;
+
+                case "--online-reference-report-path":
+                    if (i + 1 < args.Length)
+                    {
+                        options.OnlineReferenceReportPath = args[++i];
                     }
                     break;
 
