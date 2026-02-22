@@ -30,6 +30,11 @@ Date: 2026-02-21
 - Implemented validation harness:
   - `tests/ShotSuiteRunner`
   - 10-case shot suite fixture and baseline recorder
+  - locked fixture metadata (`Reference`) with optional real-world enforcement gate (`--require-real-reference`)
+  - event expectation gates (`EventExpectations`):
+    - first-contact ball id
+    - first-contact time tolerance
+    - pocket outcome events (ball id + pocket id)
   - standalone sanity checks (`--sanity`):
     - head-on transfer
     - overlap recovery
@@ -41,6 +46,7 @@ Date: 2026-02-21
   - randomized stress invariants (`--stress`)
   - benchmark breakdown + perf warnings (`--benchmark`, `--profile`, `--perf-budget-ms`)
   - benchmark matrix markdown report (`--benchmark-matrix`, optional `--benchmark-report`)
+  - full validation report markdown (`--validation-report`, optional `--validation-report-path`)
   - non-default profile baseline guard (skips fixture compare unless `--force-baseline`)
 - Stability fixes:
   - corrected ball-ball normal-velocity sign handling in impulse resolution
@@ -56,6 +62,7 @@ Date: 2026-02-21
 - Stress check passes at 1000 randomized shots (seed 1337).
 - Benchmark profile presets execute with detailed throughput metrics and warning thresholds.
 - Benchmark matrix runner writes a docs report table at `docs/BENCHMARK_MATRIX.md`.
+- Validation report runner writes preset delta summaries at `docs/VALIDATION_REPORT.md`.
 
 ## Deferred (Post-V1)
 

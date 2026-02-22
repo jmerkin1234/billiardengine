@@ -25,7 +25,59 @@
       1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:26Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.3687499999999993,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 1,
+          "PocketId": 1
+        },
+        {
+          "BallId": 3,
+          "PocketId": 0
+        },
+        {
+          "BallId": 8,
+          "PocketId": 0
+        },
+        {
+          "BallId": 12,
+          "PocketId": 3
+        },
+        {
+          "BallId": 0,
+          "PocketId": 4
+        },
+        {
+          "BallId": 10,
+          "PocketId": 3
+        },
+        {
+          "BallId": 15,
+          "PocketId": 3
+        },
+        {
+          "BallId": 2,
+          "PocketId": 3
+        },
+        {
+          "BallId": 9,
+          "PocketId": 3
+        }
+      ]
+    }
   },
   {
     "Name": "Follow shot",
@@ -53,7 +105,63 @@
       1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:26Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.29999999999999954,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 8,
+          "PocketId": 1
+        },
+        {
+          "BallId": 1,
+          "PocketId": 1
+        },
+        {
+          "BallId": 10,
+          "PocketId": 4
+        },
+        {
+          "BallId": 12,
+          "PocketId": 4
+        },
+        {
+          "BallId": 0,
+          "PocketId": 4
+        },
+        {
+          "BallId": 11,
+          "PocketId": 2
+        },
+        {
+          "BallId": 3,
+          "PocketId": 0
+        },
+        {
+          "BallId": 2,
+          "PocketId": 3
+        },
+        {
+          "BallId": 5,
+          "PocketId": 3
+        },
+        {
+          "BallId": 15,
+          "PocketId": 3
+        }
+      ]
+    }
   },
   {
     "Name": "Draw shot",
@@ -81,7 +189,47 @@
       1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:26Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.29999999999999954,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 8,
+          "PocketId": 1
+        },
+        {
+          "BallId": 15,
+          "PocketId": 4
+        },
+        {
+          "BallId": 2,
+          "PocketId": 4
+        },
+        {
+          "BallId": 0,
+          "PocketId": 3
+        },
+        {
+          "BallId": 1,
+          "PocketId": 0
+        },
+        {
+          "BallId": 3,
+          "PocketId": 0
+        }
+      ]
+    }
   },
   {
     "Name": "Cut shot with throw",
@@ -109,7 +257,39 @@
       -0.5588
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:27Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 7,
+      "ExpectedFirstContactTimeSeconds": 3.9104166666666047,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 14,
+          "PocketId": 1
+        },
+        {
+          "BallId": 9,
+          "PocketId": 1
+        },
+        {
+          "BallId": 7,
+          "PocketId": 1
+        },
+        {
+          "BallId": 4,
+          "PocketId": 2
+        }
+      ]
+    }
   },
   {
     "Name": "Running english rail rebound",
@@ -137,7 +317,47 @@
       1.0706522529791003
     ],
     "ExpectedExitAngleDeg": 124.49043758470364,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:27Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 3,
+      "ExpectedFirstContactTimeSeconds": 0.46874999999999895,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 7,
+          "PocketId": 5
+        },
+        {
+          "BallId": 12,
+          "PocketId": 4
+        },
+        {
+          "BallId": 5,
+          "PocketId": 4
+        },
+        {
+          "BallId": 3,
+          "PocketId": 0
+        },
+        {
+          "BallId": 4,
+          "PocketId": 2
+        },
+        {
+          "BallId": 6,
+          "PocketId": 3
+        }
+      ]
+    }
   },
   {
     "Name": "Reverse english rail rebound",
@@ -165,7 +385,47 @@
       1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:27Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 3,
+      "ExpectedFirstContactTimeSeconds": 0.4666666666666656,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 14,
+          "PocketId": 0
+        },
+        {
+          "BallId": 0,
+          "PocketId": 4
+        },
+        {
+          "BallId": 8,
+          "PocketId": 5
+        },
+        {
+          "BallId": 7,
+          "PocketId": 4
+        },
+        {
+          "BallId": 3,
+          "PocketId": 0
+        },
+        {
+          "BallId": 9,
+          "PocketId": 3
+        }
+      ]
+    }
   },
   {
     "Name": "Jaw rattle then pocket",
@@ -193,7 +453,55 @@
       -1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:27Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.38958333333333256,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 1,
+          "PocketId": 2
+        },
+        {
+          "BallId": 5,
+          "PocketId": 4
+        },
+        {
+          "BallId": 12,
+          "PocketId": 4
+        },
+        {
+          "BallId": 7,
+          "PocketId": 0
+        },
+        {
+          "BallId": 6,
+          "PocketId": 0
+        },
+        {
+          "BallId": 4,
+          "PocketId": 2
+        },
+        {
+          "BallId": 9,
+          "PocketId": 0
+        },
+        {
+          "BallId": 15,
+          "PocketId": 0
+        }
+      ]
+    }
   },
   {
     "Name": "Jaw reject",
@@ -221,7 +529,39 @@
       -1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:27Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.2958333333333329,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 1,
+          "PocketId": 0
+        },
+        {
+          "BallId": 13,
+          "PocketId": 0
+        },
+        {
+          "BallId": 3,
+          "PocketId": 3
+        },
+        {
+          "BallId": 12,
+          "PocketId": 5
+        }
+      ]
+    }
   },
   {
     "Name": "Medium break stability",
@@ -249,7 +589,55 @@
       0.8921129227102228
     ],
     "ExpectedExitAngleDeg": -6.005276755317596,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:27Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.18541666666666662,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 14,
+          "PocketId": 1
+        },
+        {
+          "BallId": 10,
+          "PocketId": 3
+        },
+        {
+          "BallId": 15,
+          "PocketId": 0
+        },
+        {
+          "BallId": 8,
+          "PocketId": 2
+        },
+        {
+          "BallId": 1,
+          "PocketId": 0
+        },
+        {
+          "BallId": 9,
+          "PocketId": 4
+        },
+        {
+          "BallId": 12,
+          "PocketId": 5
+        },
+        {
+          "BallId": 6,
+          "PocketId": 3
+        }
+      ]
+    }
   },
   {
     "Name": "Frozen-ball contact stability",
@@ -277,6 +665,46 @@
       -1.1176
     ],
     "ExpectedExitAngleDeg": 0,
-    "ExpectedSettleSeconds": 8.00208333333304
+    "ExpectedSettleSeconds": 8.00208333333304,
+    "Reference": {
+      "Source": "SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE",
+      "CapturedAtUtc": "2026-02-22T01:49:28Z",
+      "Locked": true,
+      "RealWorldReference": false,
+      "Notes": ""
+    },
+    "EventExpectations": {
+      "ValidateFirstContact": true,
+      "ExpectedFirstContactBallId": 1,
+      "ExpectedFirstContactTimeSeconds": 0.44374999999999903,
+      "FirstContactTimeToleranceSeconds": 0.05,
+      "ValidatePocketOutcome": true,
+      "ExpectedPocketEvents": [
+        {
+          "BallId": 1,
+          "PocketId": 0
+        },
+        {
+          "BallId": 14,
+          "PocketId": 0
+        },
+        {
+          "BallId": 0,
+          "PocketId": 4
+        },
+        {
+          "BallId": 2,
+          "PocketId": 3
+        },
+        {
+          "BallId": 8,
+          "PocketId": 0
+        },
+        {
+          "BallId": 10,
+          "PocketId": 3
+        }
+      ]
+    }
   }
 ]

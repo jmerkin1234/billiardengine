@@ -15,7 +15,7 @@ This workspace contains a standalone billiards physics engine rewrite for 8ft 8-
   - `Config`: physics profile (canonical tuning source)
   - `Collision`: CCD utilities
   - `Dynamics`: `BilliardsPhysicsWorld` fixed-step impulse solver
-- `Prediction`: ghost-path trajectory prediction
+  - `Prediction`: ghost-path trajectory prediction
 - `unity-adapter`
   - `Runtime`: `UnityPhysicsRuntimeController`, `UnityCueStrikeAdapter`
   - `Compatibility`: shims for legacy-style ball/spin/pocket access
@@ -36,13 +36,19 @@ dotnet build /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuite
 Record or refresh baseline outcomes:
 
 ```bash
-dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --record --fixtures /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/shot_suite_baseline.json
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --record --allow-record-locked --reference-source SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE --fixtures /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/shot_suite_baseline.json
 ```
 
 Run acceptance suite (`<=3cm`, `<=3deg`, `<=0.25s`):
 
 ```bash
 dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --fixtures /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/shot_suite_baseline.json
+```
+
+Enforce real-world references in CI / gated runs:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --fixtures /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/shot_suite_baseline.json --require-real-reference
 ```
 
 Run standalone sanity checks (no Unity model required):
@@ -94,6 +100,15 @@ Optional custom report path:
 dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --benchmark-matrix 120 --benchmark-report /absolute/path/report.md
 ```
 
+Run full validation report (suite deltas by preset + benchmark matrix linkage):
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --validation-report --benchmark-matrix 120 --perf-budget-ms 6
+```
+
+Default validation report output:
+- `/home/justin/Pictures/billiardengine/engine-rewrite/docs/VALIDATION_REPORT.md`
+
 Profile presets:
 - `physics` (default): 480Hz, highest fidelity.
 - `balanced`: 360Hz, moderate fallback.
@@ -102,6 +117,8 @@ Profile presets:
 Notes:
 - Baseline fixture comparison is auto-skipped for non-`physics` presets.
 - Add `--force-baseline` to compare fixture expectations on non-default presets.
+- Fixtures include locked reference metadata and event expectations (first-contact + pocket outcomes).
+- Use `--allow-record-locked` when intentionally rewriting locked fixtures.
 
 ## Unity Integration (Adapter)
 
@@ -119,4 +136,4 @@ Notes:
 - Prediction output includes first-contact ball id, point, and relative time metadata.
 - Ball-ball response includes corrected relative-normal sign handling and post-collision penetration stabilization.
 - Jump/massé/squirt/miscue are intentionally deferred (post-V1 backlog).
-- Baseline fixture currently contains recorded output from this solver build; if solver logic changes, re-record baseline.
+- Baseline fixture is currently tagged `SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE` and not yet marked as real-world reference data.

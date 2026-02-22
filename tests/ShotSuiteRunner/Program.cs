@@ -32,6 +32,8 @@ if (fixtures.Length == 0)
     Environment.Exit(2);
 }
 
+NormalizeFixtures(fixtures);
+
 PhysicsProfile profile = new();
 ApplyProfilePreset(profile, normalizedProfilePreset);
 BilliardPhysicsEngine engine = new();
@@ -44,7 +46,15 @@ engine.Initialize(table, profile, rack.InitialStates);
 
 if (options.RecordMode)
 {
-    RunRecordMode(engine, rack, profile, fixtures, fixturesPath);
+    RunRecordMode(
+        engine,
+        rack,
+        profile,
+        fixtures,
+        fixturesPath,
+        options.AllowRecordLocked,
+        options.ReferenceSource,
+        options.MarkRealReference);
     Environment.Exit(0);
 }
 
@@ -82,6 +92,14 @@ if (options.BenchmarkShots > 0)
     _ = RunBenchmarkMode(engine, rack, profile, options.BenchmarkShots, options.RandomSeed, options.PerfBudgetMs);
 }
 
+if (options.ValidationReportMode)
+{
+    string validationReportPath = ResolveValidationReportPath(options.ValidationReportPath);
+    int matrixShots = options.BenchmarkMatrixShots > 0 ? options.BenchmarkMatrixShots : 120;
+    int code = RunValidationReport(fixtures, matrixShots, options.RandomSeed, options.PerfBudgetMs, validationReportPath, options.RequireRealReference);
+    Environment.Exit(code);
+}
+
 if (options.BenchmarkMatrixShots > 0)
 {
     string reportPath = ResolveBenchmarkReportPath(options.BenchmarkReportPath);
@@ -95,16 +113,22 @@ if (!options.ForceBaseline && normalizedProfilePreset != "physics")
     Environment.Exit(0);
 }
 
-int failed = RunBaselineComparison(engine, rack, profile, fixtures);
+int failed = RunBaselineComparison(engine, rack, profile, fixtures, options.RequireRealReference);
 Environment.Exit(failed == 0 ? 0 : 1);
 
-static int RunBaselineComparison(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, ShotFixture[] fixtures)
+static int RunBaselineComparison(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, ShotFixture[] fixtures, bool requireRealReference)
 {
     int passed = 0;
     int failed = 0;
+    int notRealReferenceCount = 0;
 
     foreach (ShotFixture fixture in fixtures)
     {
+        if (!fixture.Reference!.RealWorldReference)
+        {
+            notRealReferenceCount++;
+        }
+
         SimResult result = Simulate(engine, rack, profile, fixture);
         if (!result.Success)
         {
@@ -113,28 +137,30 @@ static int RunBaselineComparison(BilliardPhysicsEngine engine, RackPreset rack, 
             continue;
         }
 
-        if (fixture.RequireRestByHorizon && !result.ReachedRest)
-        {
-            Console.WriteLine($"FAIL {fixture.Name}: did not reach rest by horizon ({fixture.HorizonSeconds:F2}s)");
-            failed++;
-            continue;
-        }
-
-        PhysVector3 expected = new(fixture.ExpectedFinalPosition[0], fixture.ExpectedFinalPosition[1], fixture.ExpectedFinalPosition[2]);
-        double posErr = (result.FinalPosition - expected).Length;
-        double angleErr = Math.Abs(NormalizeDeltaAngle(result.ExitAngleDeg, fixture.ExpectedExitAngleDeg));
-        double settleErr = Math.Abs(result.SettleSeconds - fixture.ExpectedSettleSeconds);
-
-        bool pass = posErr <= MaxPositionError && angleErr <= MaxAngleErrorDeg && settleErr <= MaxSettleErrorSeconds;
-        if (pass)
+        FixtureEvaluation eval = EvaluateFixture(fixture, result);
+        if (eval.Passed)
         {
             passed++;
-            Console.WriteLine($"PASS {fixture.Name}: pos={posErr:F4}m angle={angleErr:F2}deg settle={settleErr:F3}s");
+            Console.WriteLine($"PASS {fixture.Name}: pos={eval.PositionError:F4}m angle={eval.AngleErrorDeg:F2}deg settle={eval.SettleErrorSeconds:F3}s");
         }
         else
         {
             failed++;
-            Console.WriteLine($"FAIL {fixture.Name}: pos={posErr:F4}m angle={angleErr:F2}deg settle={settleErr:F3}s");
+            Console.WriteLine($"FAIL {fixture.Name}: {eval.Message}");
+        }
+    }
+
+    if (notRealReferenceCount > 0)
+    {
+        string msg = $"Reference audit: {notRealReferenceCount}/{fixtures.Length} fixtures are not marked real-world references.";
+        if (requireRealReference)
+        {
+            Console.WriteLine($"FAIL {msg}");
+            failed++;
+        }
+        else
+        {
+            Console.WriteLine($"WARN {msg}");
         }
     }
 
@@ -142,11 +168,25 @@ static int RunBaselineComparison(BilliardPhysicsEngine engine, RackPreset rack, 
     return failed;
 }
 
-static void RunRecordMode(BilliardPhysicsEngine engine, RackPreset rack, PhysicsProfile profile, ShotFixture[] fixtures, string fixturesPath)
+static void RunRecordMode(
+    BilliardPhysicsEngine engine,
+    RackPreset rack,
+    PhysicsProfile profile,
+    ShotFixture[] fixtures,
+    string fixturesPath,
+    bool allowLockedOverwrite,
+    string referenceSource,
+    bool markRealReference)
 {
     for (int i = 0; i < fixtures.Length; i++)
     {
         ShotFixture fixture = fixtures[i];
+        if (fixture.Reference!.Locked && !allowLockedOverwrite)
+        {
+            Console.WriteLine($"SKIP {fixture.Name}: locked reference (use --allow-record-locked to override)");
+            continue;
+        }
+
         SimResult result = Simulate(engine, rack, profile, fixture);
         if (!result.Success)
         {
@@ -157,6 +197,24 @@ static void RunRecordMode(BilliardPhysicsEngine engine, RackPreset rack, Physics
         fixture.ExpectedFinalPosition = new[] { result.FinalPosition.X, result.FinalPosition.Y, result.FinalPosition.Z };
         fixture.ExpectedExitAngleDeg = result.ExitAngleDeg;
         fixture.ExpectedSettleSeconds = result.SettleSeconds;
+        fixture.EventExpectations!.ValidateFirstContact = true;
+        fixture.EventExpectations.ExpectedFirstContactBallId = result.FirstContactBallId;
+        fixture.EventExpectations.ExpectedFirstContactTimeSeconds = result.FirstContactTimeSeconds;
+        if (fixture.EventExpectations.FirstContactTimeToleranceSeconds <= 0.0)
+        {
+            fixture.EventExpectations.FirstContactTimeToleranceSeconds = 0.050;
+        }
+
+        fixture.EventExpectations.ValidatePocketOutcome = true;
+        fixture.EventExpectations.ExpectedPocketEvents = result.PocketEvents
+            .Select(x => new ExpectedPocketEvent { BallId = x.BallId, PocketId = x.PocketId })
+            .ToArray();
+
+        fixture.Reference.Source = referenceSource;
+        fixture.Reference.CapturedAtUtc = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ", CultureInfo.InvariantCulture);
+        fixture.Reference.RealWorldReference = markRealReference;
+        fixture.Reference.Locked = true;
+
         fixtures[i] = fixture;
         Console.WriteLine($"RECORDED {fixture.Name}");
     }
@@ -178,6 +236,112 @@ static void RunAnalyzeMode(BilliardPhysicsEngine engine, RackPreset rack, Physic
         }
 
         Console.WriteLine($"{fixture.Name}: settle={result.SettleSeconds:F3}s reachedRest={result.ReachedRest} moving={result.FinalMovingCount} events={result.EventCount}");
+    }
+}
+
+static FixtureEvaluation EvaluateFixture(ShotFixture fixture, SimResult result)
+{
+    if (fixture.RequireRestByHorizon && !result.ReachedRest)
+    {
+        return new FixtureEvaluation(
+            false,
+            0.0,
+            0.0,
+            Math.Abs(result.SettleSeconds - fixture.HorizonSeconds),
+            $"did not reach rest by horizon ({fixture.HorizonSeconds:F2}s)");
+    }
+
+    PhysVector3 expected = new(fixture.ExpectedFinalPosition[0], fixture.ExpectedFinalPosition[1], fixture.ExpectedFinalPosition[2]);
+    double posErr = (result.FinalPosition - expected).Length;
+    double angleErr = Math.Abs(NormalizeDeltaAngle(result.ExitAngleDeg, fixture.ExpectedExitAngleDeg));
+    double settleErr = Math.Abs(result.SettleSeconds - fixture.ExpectedSettleSeconds);
+
+    bool corePass = posErr <= MaxPositionError && angleErr <= MaxAngleErrorDeg && settleErr <= MaxSettleErrorSeconds;
+    if (!corePass)
+    {
+        return new FixtureEvaluation(
+            false,
+            posErr,
+            angleErr,
+            settleErr,
+            $"pos={posErr:F4}m angle={angleErr:F2}deg settle={settleErr:F3}s");
+    }
+
+    if (!ValidateEventExpectations(fixture, result, out string eventReason))
+    {
+        return new FixtureEvaluation(
+            false,
+            posErr,
+            angleErr,
+            settleErr,
+            $"event mismatch: {eventReason}");
+    }
+
+    return new FixtureEvaluation(true, posErr, angleErr, settleErr, "ok");
+}
+
+static bool ValidateEventExpectations(ShotFixture fixture, SimResult result, out string reason)
+{
+    ShotEventExpectations expectations = fixture.EventExpectations!;
+
+    if (expectations.ValidateFirstContact)
+    {
+        if (expectations.ExpectedFirstContactBallId >= 0 && result.FirstContactBallId != expectations.ExpectedFirstContactBallId)
+        {
+            reason = $"first-contact ball expected {expectations.ExpectedFirstContactBallId} got {result.FirstContactBallId}";
+            return false;
+        }
+
+        if (expectations.ExpectedFirstContactTimeSeconds >= 0.0)
+        {
+            if (result.FirstContactTimeSeconds < 0.0)
+            {
+                reason = "first-contact time missing";
+                return false;
+            }
+
+            double tolerance = Math.Max(0.0, expectations.FirstContactTimeToleranceSeconds);
+            double delta = Math.Abs(result.FirstContactTimeSeconds - expectations.ExpectedFirstContactTimeSeconds);
+            if (delta > tolerance)
+            {
+                reason = $"first-contact time delta {delta:F4}s exceeds tolerance {tolerance:F4}s";
+                return false;
+            }
+        }
+    }
+
+    if (expectations.ValidatePocketOutcome)
+    {
+        ExpectedPocketEvent[] expectedPockets = expectations.ExpectedPocketEvents ?? Array.Empty<ExpectedPocketEvent>();
+        SimPocketEvent[] actualPockets = result.PocketEvents ?? Array.Empty<SimPocketEvent>();
+
+        if (expectedPockets.Length != actualPockets.Length)
+        {
+            reason = $"pocket event count expected {expectedPockets.Length} got {actualPockets.Length}";
+            return false;
+        }
+
+        for (int i = 0; i < expectedPockets.Length; i++)
+        {
+            if (expectedPockets[i].BallId != actualPockets[i].BallId || expectedPockets[i].PocketId != actualPockets[i].PocketId)
+            {
+                reason = $"pocket event#{i} expected ({expectedPockets[i].BallId},{expectedPockets[i].PocketId}) got ({actualPockets[i].BallId},{actualPockets[i].PocketId})";
+                return false;
+            }
+        }
+    }
+
+    reason = string.Empty;
+    return true;
+}
+
+static void NormalizeFixtures(ShotFixture[] fixtures)
+{
+    for (int i = 0; i < fixtures.Length; i++)
+    {
+        fixtures[i].Reference ??= new FixtureReferenceMetadata();
+        fixtures[i].EventExpectations ??= new ShotEventExpectations();
+        fixtures[i].EventExpectations!.ExpectedPocketEvents ??= Array.Empty<ExpectedPocketEvent>();
     }
 }
 
@@ -472,6 +636,192 @@ static int RunBenchmarkMatrix(int shots, int seed, double perfBudgetMs, string r
     WriteBenchmarkMatrixReport(rows, shots, seed, perfBudgetMs, reportPath);
     Console.WriteLine($"Benchmark matrix report written to {reportPath}");
     return 0;
+}
+
+static int RunValidationReport(
+    ShotFixture[] fixtures,
+    int matrixShots,
+    int seed,
+    double perfBudgetMs,
+    string reportPath,
+    bool requireRealReference)
+{
+    Console.WriteLine($"Validation Report: fixtures={fixtures.Length}, matrixShots={matrixShots}, seed={seed}");
+
+    string matrixPath = ResolveBenchmarkReportPath(null);
+    int matrixCode = RunBenchmarkMatrix(matrixShots, seed, perfBudgetMs, matrixPath);
+    if (matrixCode != 0)
+    {
+        return matrixCode;
+    }
+
+    string[] presets = { "physics", "balanced", "debug240" };
+    List<PresetValidationSummary> summaries = new(presets.Length);
+
+    for (int i = 0; i < presets.Length; i++)
+    {
+        summaries.Add(EvaluatePresetValidation(fixtures, presets[i]));
+    }
+
+    int nonRealReferenceCount = fixtures.Count(x => !x.Reference!.RealWorldReference);
+    WriteValidationReport(fixtures, summaries, matrixShots, seed, perfBudgetMs, matrixPath, reportPath, nonRealReferenceCount);
+    Console.WriteLine($"Validation report written to {reportPath}");
+
+    int physicsFailed = summaries.First(x => x.Preset == "physics").Failed;
+    if (requireRealReference && nonRealReferenceCount > 0)
+    {
+        return 1;
+    }
+
+    return physicsFailed == 0 ? 0 : 1;
+}
+
+static PresetValidationSummary EvaluatePresetValidation(ShotFixture[] fixtures, string preset)
+{
+    PhysicsProfile profile = new();
+    ApplyProfilePreset(profile, preset);
+    BilliardPhysicsEngine engine = new();
+    TableGeometry table = engine.CreateEightFootTable(0.0);
+    RackPreset rack = RackPreset.EightBall(table, profile.BallRadius, profile.BallMass, 0, Enumerable.Range(1, 15).ToArray());
+    engine.Initialize(table, profile, rack.InitialStates);
+
+    int passed = 0;
+    int failed = 0;
+    int eventFailures = 0;
+    double totalPosErr = 0.0;
+    double totalAngleErr = 0.0;
+    double totalSettleErr = 0.0;
+    List<string> failureSamples = new(3);
+
+    for (int i = 0; i < fixtures.Length; i++)
+    {
+        ShotFixture fixture = fixtures[i];
+        SimResult result = Simulate(engine, rack, profile, fixture);
+        if (!result.Success)
+        {
+            failed++;
+            if (failureSamples.Count < 3)
+            {
+                failureSamples.Add($"{fixture.Name}: sim error ({result.Error})");
+            }
+
+            continue;
+        }
+
+        FixtureEvaluation eval = EvaluateFixture(fixture, result);
+        totalPosErr += eval.PositionError;
+        totalAngleErr += eval.AngleErrorDeg;
+        totalSettleErr += eval.SettleErrorSeconds;
+        if (eval.Passed)
+        {
+            passed++;
+        }
+        else
+        {
+            failed++;
+            if (eval.Message.StartsWith("event mismatch:", StringComparison.Ordinal))
+            {
+                eventFailures++;
+            }
+
+            if (failureSamples.Count < 3)
+            {
+                failureSamples.Add($"{fixture.Name}: {eval.Message}");
+            }
+        }
+    }
+
+    int sampleCount = Math.Max(1, fixtures.Length);
+    return new PresetValidationSummary(
+        preset,
+        profile.SimulationHz,
+        passed,
+        failed,
+        totalPosErr / sampleCount,
+        totalAngleErr / sampleCount,
+        totalSettleErr / sampleCount,
+        eventFailures,
+        failureSamples);
+}
+
+static void WriteValidationReport(
+    ShotFixture[] fixtures,
+    IReadOnlyList<PresetValidationSummary> summaries,
+    int matrixShots,
+    int seed,
+    double perfBudgetMs,
+    string matrixReportPath,
+    string reportPath,
+    int nonRealReferenceCount)
+{
+    int physicsPasses = summaries.First(x => x.Preset == "physics").Passed;
+    string budgetLabel = perfBudgetMs > 0.0
+        ? $"{perfBudgetMs.ToString("F2", CultureInfo.InvariantCulture)} ms/shot"
+        : "off";
+
+    StringBuilder md = new();
+    md.AppendLine("# Validation Report");
+    md.AppendLine();
+    md.AppendLine($"- Generated (UTC): `{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)} UTC`");
+    md.AppendLine($"- Fixtures: `{fixtures.Length}`");
+    md.AppendLine($"- Real-world references marked: `{fixtures.Length - nonRealReferenceCount}/{fixtures.Length}`");
+    md.AppendLine($"- Benchmark matrix shots: `{matrixShots}`");
+    md.AppendLine($"- Seed: `{seed}`");
+    md.AppendLine($"- Perf budget: `{budgetLabel}`");
+    md.AppendLine($"- Benchmark matrix report: `{Path.GetFullPath(matrixReportPath)}`");
+    md.AppendLine();
+    md.AppendLine("| Preset | Hz | Passed | Failed | Pass Delta vs physics | Avg Pos Err (m) | Avg Angle Err (deg) | Avg Settle Err (s) | Event Failures |");
+    md.AppendLine("|---|---:|---:|---:|---:|---:|---:|---:|---:|");
+
+    for (int i = 0; i < summaries.Count; i++)
+    {
+        PresetValidationSummary s = summaries[i];
+        int delta = s.Passed - physicsPasses;
+        md.AppendLine(
+            $"| `{s.Preset}` | {s.SimulationHz} | {s.Passed} | {s.Failed} | {delta} | " +
+            $"{s.AvgPositionError.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{s.AvgAngleErrorDeg.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{s.AvgSettleErrorSeconds.ToString("F3", CultureInfo.InvariantCulture)} | " +
+            $"{s.EventFailures} |");
+    }
+
+    md.AppendLine();
+    md.AppendLine("## Notes");
+    md.AppendLine("- Fixture pass/fail uses position, angle, settle-time, and event expectation gates.");
+    md.AppendLine("- Event gates include first-contact ball id, first-contact time tolerance, and pocket outcome checks.");
+    md.AppendLine("- `Pass Delta vs physics` is each preset pass-count minus physics pass-count.");
+    if (nonRealReferenceCount > 0)
+    {
+        md.AppendLine($"- WARNING: `{nonRealReferenceCount}` fixture(s) are not marked as real-world references.");
+    }
+
+    md.AppendLine();
+    md.AppendLine("## Failure Samples");
+    for (int i = 0; i < summaries.Count; i++)
+    {
+        PresetValidationSummary s = summaries[i];
+        md.AppendLine($"### {s.Preset}");
+        if (s.FailureSamples.Count == 0)
+        {
+            md.AppendLine("- none");
+        }
+        else
+        {
+            for (int f = 0; f < s.FailureSamples.Count; f++)
+            {
+                md.AppendLine($"- {s.FailureSamples[f]}");
+            }
+        }
+    }
+
+    string fullPath = Path.GetFullPath(reportPath);
+    string? dir = Path.GetDirectoryName(fullPath);
+    if (!string.IsNullOrWhiteSpace(dir))
+    {
+        Directory.CreateDirectory(dir);
+    }
+
+    File.WriteAllText(fullPath, md.ToString());
 }
 
 static void WriteBenchmarkMatrixReport(IReadOnlyList<(string Preset, BenchmarkResult Result)> rows, int shots, int seed, double perfBudgetMs, string reportPath)
@@ -1129,6 +1479,10 @@ static SimResult Simulate(BilliardPhysicsEngine engine, RackPreset rack, Physics
 
     double simSeconds = 0.0;
     int eventCount = 0;
+    int firstContactBallId = -1;
+    double firstContactTimeSeconds = -1.0;
+    PhysVector3 firstContactPoint = PhysVector3.Zero;
+    List<SimPocketEvent> pocketEvents = new();
     SimulationFrame frame = engine.Step(0.0);
 
     while (simSeconds < fixture.HorizonSeconds)
@@ -1136,6 +1490,25 @@ static SimResult Simulate(BilliardPhysicsEngine engine, RackPreset rack, Physics
         frame = engine.Step(1.0 / profile.SimulationHz);
         simSeconds += 1.0 / profile.SimulationHz;
         eventCount += frame.Events.Length;
+
+        for (int i = 0; i < frame.Events.Length; i++)
+        {
+            PhysicsEvent evt = frame.Events[i];
+            if (evt.Type == PhysicsEventType.BallBallContact && firstContactBallId < 0)
+            {
+                int resolved = ResolveFirstObjectBallId(fixture.ShotBallId, evt.BallAId, evt.BallBId);
+                if (resolved >= 0)
+                {
+                    firstContactBallId = resolved;
+                    firstContactTimeSeconds = evt.Time;
+                    firstContactPoint = evt.Position;
+                }
+            }
+            else if (evt.Type == PhysicsEventType.Pocketed)
+            {
+                pocketEvents.Add(new SimPocketEvent(evt.BallAId, evt.PocketId, evt.Time));
+            }
+        }
 
         if (!ValidateNumericFrame(frame, out string reason))
         {
@@ -1154,11 +1527,37 @@ static SimResult Simulate(BilliardPhysicsEngine engine, RackPreset rack, Physics
         {
             BallState tracked = frame.Balls[i];
             double exitAngle = Math.Atan2(tracked.Velocity.X, tracked.Velocity.Z) * (180.0 / Math.PI);
-            return SimResult.Ok(tracked.Position, exitAngle, simSeconds, frame.IsAtRest, frame.MovingBallCount, eventCount, frame);
+            return SimResult.Ok(
+                tracked.Position,
+                exitAngle,
+                simSeconds,
+                frame.IsAtRest,
+                frame.MovingBallCount,
+                eventCount,
+                firstContactBallId,
+                firstContactTimeSeconds,
+                firstContactPoint,
+                pocketEvents.ToArray(),
+                frame);
         }
     }
 
     return SimResult.Fail($"tracked ball {fixture.TrackBallId} not found");
+}
+
+static int ResolveFirstObjectBallId(int shotBallId, int a, int b)
+{
+    if (a == shotBallId && b != shotBallId)
+    {
+        return b;
+    }
+
+    if (b == shotBallId && a != shotBallId)
+    {
+        return a;
+    }
+
+    return -1;
 }
 
 static bool ValidateFrame(SimulationFrame frame, TableGeometry table, out string reason)
@@ -1297,6 +1696,22 @@ static string ResolveBenchmarkReportPath(string? argPath)
     return Path.Combine(Environment.CurrentDirectory, "BENCHMARK_MATRIX.md");
 }
 
+static string ResolveValidationReportPath(string? argPath)
+{
+    if (!string.IsNullOrWhiteSpace(argPath))
+    {
+        return Path.GetFullPath(argPath);
+    }
+
+    string? repoRoot = TryFindRepositoryRoot();
+    if (!string.IsNullOrWhiteSpace(repoRoot))
+    {
+        return Path.Combine(repoRoot, "docs", "VALIDATION_REPORT.md");
+    }
+
+    return Path.Combine(Environment.CurrentDirectory, "VALIDATION_REPORT.md");
+}
+
 static string? TryFindRepositoryRoot()
 {
     string[] startPaths = { Environment.CurrentDirectory, AppContext.BaseDirectory };
@@ -1342,6 +1757,10 @@ internal readonly struct SimResult
     public bool ReachedRest { get; }
     public int FinalMovingCount { get; }
     public int EventCount { get; }
+    public int FirstContactBallId { get; }
+    public double FirstContactTimeSeconds { get; }
+    public PhysVector3 FirstContactPoint { get; }
+    public SimPocketEvent[] PocketEvents { get; }
     public SimulationFrame FinalFrame { get; }
 
     private SimResult(
@@ -1353,6 +1772,10 @@ internal readonly struct SimResult
         bool reachedRest,
         int finalMovingCount,
         int eventCount,
+        int firstContactBallId,
+        double firstContactTimeSeconds,
+        in PhysVector3 firstContactPoint,
+        SimPocketEvent[] pocketEvents,
         in SimulationFrame finalFrame)
     {
         Success = success;
@@ -1363,6 +1786,10 @@ internal readonly struct SimResult
         ReachedRest = reachedRest;
         FinalMovingCount = finalMovingCount;
         EventCount = eventCount;
+        FirstContactBallId = firstContactBallId;
+        FirstContactTimeSeconds = firstContactTimeSeconds;
+        FirstContactPoint = firstContactPoint;
+        PocketEvents = pocketEvents;
         FinalFrame = finalFrame;
     }
 
@@ -1373,11 +1800,55 @@ internal readonly struct SimResult
         bool reachedRest,
         int finalMovingCount,
         int eventCount,
+        int firstContactBallId,
+        double firstContactTimeSeconds,
+        in PhysVector3 firstContactPoint,
+        SimPocketEvent[] pocketEvents,
         in SimulationFrame finalFrame)
-        => new(true, string.Empty, finalPosition, exitAngleDeg, settleSeconds, reachedRest, finalMovingCount, eventCount, finalFrame);
+        => new(
+            true,
+            string.Empty,
+            finalPosition,
+            exitAngleDeg,
+            settleSeconds,
+            reachedRest,
+            finalMovingCount,
+            eventCount,
+            firstContactBallId,
+            firstContactTimeSeconds,
+            firstContactPoint,
+            pocketEvents,
+            finalFrame);
 
     public static SimResult Fail(string error)
-        => new(false, error, PhysVector3.Zero, 0.0, 0.0, false, 0, 0, SimulationFrame.Empty);
+        => new(
+            false,
+            error,
+            PhysVector3.Zero,
+            0.0,
+            0.0,
+            false,
+            0,
+            0,
+            -1,
+            -1.0,
+            PhysVector3.Zero,
+            Array.Empty<SimPocketEvent>(),
+            SimulationFrame.Empty);
+}
+
+internal readonly struct SimPocketEvent
+{
+    public int BallId { get; }
+    public int PocketId { get; }
+    public double TimeSeconds { get; }
+
+    public SimPocketEvent(int ballId, int pocketId, double timeSeconds)
+    {
+        BallId = ballId;
+        PocketId = pocketId;
+        TimeSeconds = timeSeconds;
+    }
 }
 
 internal readonly struct BenchmarkResult
@@ -1436,11 +1907,47 @@ internal readonly struct BenchmarkResult
         => new(simulationHz, requestedShots, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, perfBudgetMs, 0);
 }
 
+internal sealed class PresetValidationSummary
+{
+    public string Preset { get; }
+    public int SimulationHz { get; }
+    public int Passed { get; }
+    public int Failed { get; }
+    public double AvgPositionError { get; }
+    public double AvgAngleErrorDeg { get; }
+    public double AvgSettleErrorSeconds { get; }
+    public int EventFailures { get; }
+    public List<string> FailureSamples { get; }
+
+    public PresetValidationSummary(
+        string preset,
+        int simulationHz,
+        int passed,
+        int failed,
+        double avgPositionError,
+        double avgAngleErrorDeg,
+        double avgSettleErrorSeconds,
+        int eventFailures,
+        List<string> failureSamples)
+    {
+        Preset = preset;
+        SimulationHz = simulationHz;
+        Passed = passed;
+        Failed = failed;
+        AvgPositionError = avgPositionError;
+        AvgAngleErrorDeg = avgAngleErrorDeg;
+        AvgSettleErrorSeconds = avgSettleErrorSeconds;
+        EventFailures = eventFailures;
+        FailureSamples = failureSamples;
+    }
+}
+
 internal sealed class RunnerOptions
 {
     public bool RecordMode { get; private set; }
     public bool AnalyzeMode { get; private set; }
     public bool SanityMode { get; private set; }
+    public bool ValidationReportMode { get; private set; }
     public int DeterminismRepeats { get; private set; }
     public int StressShots { get; private set; }
     public int BenchmarkShots { get; private set; }
@@ -1449,8 +1956,13 @@ internal sealed class RunnerOptions
     public string ProfilePreset { get; private set; } = "physics";
     public double PerfBudgetMs { get; private set; }
     public bool ForceBaseline { get; private set; }
+    public bool AllowRecordLocked { get; private set; }
+    public bool MarkRealReference { get; private set; }
+    public bool RequireRealReference { get; private set; }
+    public string ReferenceSource { get; private set; } = "SIMULATED_PLACEHOLDER";
     public string? FixturePath { get; private set; }
     public string? BenchmarkReportPath { get; private set; }
+    public string? ValidationReportPath { get; private set; }
 
     public static RunnerOptions Parse(string[] args)
     {
@@ -1471,6 +1983,10 @@ internal sealed class RunnerOptions
 
                 case "--sanity":
                     options.SanityMode = true;
+                    break;
+
+                case "--validation-report":
+                    options.ValidationReportMode = true;
                     break;
 
                 case "--determinism":
@@ -1505,10 +2021,33 @@ internal sealed class RunnerOptions
                     options.ForceBaseline = true;
                     break;
 
+                case "--allow-record-locked":
+                    options.AllowRecordLocked = true;
+                    break;
+
+                case "--mark-real-reference":
+                    options.MarkRealReference = true;
+                    break;
+
+                case "--require-real-reference":
+                    options.RequireRealReference = true;
+                    break;
+
+                case "--reference-source":
+                    options.ReferenceSource = ReadStringArg(args, ref i, options.ReferenceSource);
+                    break;
+
                 case "--benchmark-report":
                     if (i + 1 < args.Length)
                     {
                         options.BenchmarkReportPath = args[++i];
+                    }
+                    break;
+
+                case "--validation-report-path":
+                    if (i + 1 < args.Length)
+                    {
+                        options.ValidationReportPath = args[++i];
                     }
                     break;
 
@@ -1603,4 +2142,49 @@ internal sealed class ShotFixture
     public double[] ExpectedFinalPosition { get; set; } = new double[3];
     public double ExpectedExitAngleDeg { get; set; }
     public double ExpectedSettleSeconds { get; set; }
+    public FixtureReferenceMetadata? Reference { get; set; }
+    public ShotEventExpectations? EventExpectations { get; set; }
+}
+
+internal sealed class FixtureReferenceMetadata
+{
+    public string Source { get; set; } = "UNSPECIFIED";
+    public string CapturedAtUtc { get; set; } = string.Empty;
+    public bool Locked { get; set; } = true;
+    public bool RealWorldReference { get; set; } = false;
+    public string Notes { get; set; } = string.Empty;
+}
+
+internal sealed class ShotEventExpectations
+{
+    public bool ValidateFirstContact { get; set; } = true;
+    public int ExpectedFirstContactBallId { get; set; } = -1;
+    public double ExpectedFirstContactTimeSeconds { get; set; } = -1.0;
+    public double FirstContactTimeToleranceSeconds { get; set; } = 0.050;
+    public bool ValidatePocketOutcome { get; set; } = true;
+    public ExpectedPocketEvent[] ExpectedPocketEvents { get; set; } = Array.Empty<ExpectedPocketEvent>();
+}
+
+internal sealed class ExpectedPocketEvent
+{
+    public int BallId { get; set; }
+    public int PocketId { get; set; }
+}
+
+internal readonly struct FixtureEvaluation
+{
+    public bool Passed { get; }
+    public double PositionError { get; }
+    public double AngleErrorDeg { get; }
+    public double SettleErrorSeconds { get; }
+    public string Message { get; }
+
+    public FixtureEvaluation(bool passed, double positionError, double angleErrorDeg, double settleErrorSeconds, string message)
+    {
+        Passed = passed;
+        PositionError = positionError;
+        AngleErrorDeg = angleErrorDeg;
+        SettleErrorSeconds = settleErrorSeconds;
+        Message = message;
+    }
 }
