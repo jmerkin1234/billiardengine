@@ -13,6 +13,15 @@ const double DeterminismEpsilon = 1e-10;
 
 RunnerOptions options = RunnerOptions.Parse(args);
 
+if (options.OnlineFitMode)
+{
+    string packPath = ResolveOnlineReferencePackPath(options.OnlineReferencePackPath);
+    string fitOutputPath = ResolveOnlineFitOutputPath(options.OnlineFitOutputPath);
+    string calibrationReportPath = ResolveOnlineCalibrationReportPath(options.OnlineCalibrationReportPath);
+    int code = RunOnlineFit(packPath, fitOutputPath, calibrationReportPath);
+    Environment.Exit(code);
+}
+
 if (options.OnlineReferenceReportMode)
 {
     string packPath = ResolveOnlineReferencePackPath(options.OnlineReferencePackPath);
@@ -794,6 +803,640 @@ static int RunOnlineReferenceReport(string packPath, string reportPath)
     return 0;
 }
 
+static int RunOnlineFit(string packPath, string fitOutputPath, string reportPath)
+{
+    string fullPackPath = Path.GetFullPath(packPath);
+    if (!File.Exists(fullPackPath))
+    {
+        Console.Error.WriteLine($"Online reference pack not found: {fullPackPath}");
+        return 2;
+    }
+
+    OnlineReferencePack? pack = JsonSerializer.Deserialize<OnlineReferencePack>(
+        File.ReadAllText(fullPackPath),
+        new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+    if (pack is null || pack.Clips is null || pack.Clips.Length == 0)
+    {
+        Console.Error.WriteLine($"Online reference pack is empty: {fullPackPath}");
+        return 2;
+    }
+
+    PhysicsProfile baseline = new();
+    ApplyProfilePreset(baseline, "physics");
+    TableGeometry table = TableGeometry.CreateEightFoot(0.0);
+
+    List<OnlineFitScenario> scenarios = BuildOnlineFitScenarios(pack, table);
+    if (scenarios.Count == 0)
+    {
+        Console.Error.WriteLine("No valid online-fit scenarios could be built from the reference pack.");
+        return 2;
+    }
+
+    OnlineFitEvaluation baselineEval = EvaluateOnlineFitProfile(scenarios, baseline, table);
+    PhysicsProfile bestProfile = CloneProfile(baseline);
+    OnlineFitEvaluation bestEval = baselineEval;
+
+    double[] slidingValues =
+    {
+        Math.Max(0.06, baseline.SlidingFriction * 0.80),
+        baseline.SlidingFriction,
+        baseline.SlidingFriction * 1.20
+    };
+
+    double[] rollingValues =
+    {
+        Math.Max(0.002, baseline.RollingFriction * 0.80),
+        baseline.RollingFriction,
+        baseline.RollingFriction * 1.20
+    };
+
+    double[] ballRestValues =
+    {
+        Math.Clamp(baseline.BallRestitution - 0.04, 0.82, 0.995),
+        baseline.BallRestitution,
+        Math.Clamp(baseline.BallRestitution + 0.04, 0.82, 0.995)
+    };
+
+    double[] railRestValues =
+    {
+        Math.Clamp(baseline.RailRestitution - 0.06, 0.65, 0.98),
+        baseline.RailRestitution,
+        Math.Clamp(baseline.RailRestitution + 0.06, 0.65, 0.98)
+    };
+
+    double[] pocketAssistValues =
+    {
+        Math.Max(0.01, baseline.PocketEntryAssist - 0.04),
+        baseline.PocketEntryAssist,
+        baseline.PocketEntryAssist + 0.04
+    };
+
+    List<OnlineFitTrialSummary> topTrials = new(8);
+    int trials = 0;
+
+    for (int si = 0; si < slidingValues.Length; si++)
+    {
+        for (int ri = 0; ri < rollingValues.Length; ri++)
+        {
+            for (int bi = 0; bi < ballRestValues.Length; bi++)
+            {
+                for (int railI = 0; railI < railRestValues.Length; railI++)
+                {
+                    for (int pi = 0; pi < pocketAssistValues.Length; pi++)
+                    {
+                        trials++;
+                        PhysicsProfile candidate = new();
+                        ApplyProfilePreset(candidate, "physics");
+                        candidate.SlidingFriction = slidingValues[si];
+                        candidate.RollingFriction = rollingValues[ri];
+                        candidate.BallRestitution = ballRestValues[bi];
+                        candidate.RailRestitution = railRestValues[railI];
+                        candidate.PocketEntryAssist = pocketAssistValues[pi];
+
+                        OnlineFitEvaluation eval = EvaluateOnlineFitProfile(scenarios, candidate, table);
+                        OnlineFitTrialSummary summary = new(
+                            trials,
+                            candidate.SlidingFriction,
+                            candidate.RollingFriction,
+                            candidate.BallRestitution,
+                            candidate.RailRestitution,
+                            candidate.PocketEntryAssist,
+                            eval.Score,
+                            eval.FailedClipCount);
+                        TrackTopFitTrials(topTrials, summary, 8);
+
+                        if (eval.Score + 1e-9 < bestEval.Score)
+                        {
+                            bestEval = eval;
+                            bestProfile = CloneProfile(candidate);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    string fullFitPath = Path.GetFullPath(fitOutputPath);
+    string? fitDir = Path.GetDirectoryName(fullFitPath);
+    if (!string.IsNullOrWhiteSpace(fitDir))
+    {
+        Directory.CreateDirectory(fitDir);
+    }
+
+    File.WriteAllText(
+        fullFitPath,
+        JsonSerializer.Serialize(bestProfile, new JsonSerializerOptions { WriteIndented = true }));
+
+    string fullReportPath = Path.GetFullPath(reportPath);
+    string? reportDir = Path.GetDirectoryName(fullReportPath);
+    if (!string.IsNullOrWhiteSpace(reportDir))
+    {
+        Directory.CreateDirectory(reportDir);
+    }
+
+    WriteOnlineCalibrationReport(fullPackPath, fullFitPath, fullReportPath, pack, scenarios, trials, baselineEval, bestEval, bestProfile, topTrials);
+
+    Console.WriteLine($"Online fit complete: trials={trials}, baseline score={baselineEval.Score:F4}, best score={bestEval.Score:F4}");
+    Console.WriteLine($"Best profile written to {fullFitPath}");
+    Console.WriteLine($"Calibration report written to {fullReportPath}");
+    return 0;
+}
+
+static List<OnlineFitScenario> BuildOnlineFitScenarios(OnlineReferencePack pack, TableGeometry table)
+{
+    List<OnlineFitScenario> scenarios = new(pack.Clips.Length);
+
+    for (int i = 0; i < pack.Clips.Length; i++)
+    {
+        OnlineReferenceClip clip = pack.Clips[i];
+        if (TryCreateOnlineFitScenario(clip, table, out OnlineFitScenario? scenario, out string _))
+        {
+            scenarios.Add(scenario!);
+        }
+    }
+
+    return scenarios;
+}
+
+static bool TryCreateOnlineFitScenario(OnlineReferenceClip clip, TableGeometry table, out OnlineFitScenario? scenario, out string reason)
+{
+    scenario = null;
+    reason = string.Empty;
+
+    OnlineReferenceMetrics? reference = clip.DerivedMetrics;
+    if (reference is null)
+    {
+        reason = "missing derived metrics";
+        return false;
+    }
+
+    if (clip.FirstBalls is null || clip.FirstBalls.Length == 0 || clip.LastBalls is null || clip.LastBalls.Length == 0)
+    {
+        reason = "missing ball observations";
+        return false;
+    }
+
+    List<OnlineReferenceBallObservation> first = clip.FirstBalls
+        .Where(x => x.CategoryId is 1 or 2 or 3 or 4)
+        .OrderBy(x => x.CategoryId)
+        .ThenBy(x => x.CenterMeters.Length > 0 ? x.CenterMeters[0] : 0.0)
+        .ThenBy(x => x.CenterMeters.Length > 1 ? x.CenterMeters[1] : 0.0)
+        .ToList();
+
+    if (first.Count == 0)
+    {
+        reason = "no usable first-frame observations";
+        return false;
+    }
+
+    Queue<int> solidIds = new(new[] { 1, 2, 3, 4, 5, 6, 7 });
+    Queue<int> stripeIds = new(new[] { 9, 10, 11, 12, 13, 14, 15 });
+    bool cueAssigned = false;
+    bool eightAssigned = false;
+
+    List<OnlineFitPlacement> placements = new(first.Count);
+    for (int i = 0; i < first.Count; i++)
+    {
+        OnlineReferenceBallObservation obs = first[i];
+        if (obs.CenterMeters is null || obs.CenterMeters.Length < 2)
+        {
+            continue;
+        }
+
+        double x = obs.CenterMeters[0];
+        double z = obs.CenterMeters[1];
+        PhysVector3 clamped = table.ClampBallCenter(new PhysVector3(x, table.SurfaceY + 0.028575, z), 0.028575);
+        int assignedId;
+        bool isCueBall = false;
+
+        if (obs.CategoryId == 1)
+        {
+            if (cueAssigned)
+            {
+                continue;
+            }
+
+            assignedId = 0;
+            cueAssigned = true;
+            isCueBall = true;
+        }
+        else if (obs.CategoryId == 2)
+        {
+            if (eightAssigned)
+            {
+                continue;
+            }
+
+            assignedId = 8;
+            eightAssigned = true;
+        }
+        else if (obs.CategoryId == 3)
+        {
+            if (solidIds.Count == 0)
+            {
+                continue;
+            }
+
+            assignedId = solidIds.Dequeue();
+        }
+        else if (obs.CategoryId == 4)
+        {
+            if (stripeIds.Count == 0)
+            {
+                continue;
+            }
+
+            assignedId = stripeIds.Dequeue();
+        }
+        else
+        {
+            continue;
+        }
+
+        placements.Add(new OnlineFitPlacement(assignedId, isCueBall, clamped.X, clamped.Z));
+    }
+
+    if (!cueAssigned)
+    {
+        reason = "no cue ball found in first frame";
+        return false;
+    }
+
+    OnlineReferenceBallObservation? firstCue = clip.FirstBalls.FirstOrDefault(x => x.CategoryId == 1);
+    OnlineReferenceBallObservation? lastCue = clip.LastBalls.FirstOrDefault(x => x.CategoryId == 1);
+    if (firstCue is null || lastCue is null || firstCue.CenterMeters.Length < 2 || lastCue.CenterMeters.Length < 2)
+    {
+        reason = "cue ball not found in both frames";
+        return false;
+    }
+
+    PhysVector3 cueDelta = new(
+        lastCue.CenterMeters[0] - firstCue.CenterMeters[0],
+        0.0,
+        lastCue.CenterMeters[1] - firstCue.CenterMeters[1]);
+
+    if (cueDelta.WithY(0.0).Length < 0.01)
+    {
+        OnlineFitPlacement cuePlacement = placements.First(x => x.IsCueBall);
+        OnlineFitPlacement? nearest = placements
+            .Where(x => !x.IsCueBall)
+            .OrderBy(x =>
+            {
+                double dx = x.X - cuePlacement.X;
+                double dz = x.Z - cuePlacement.Z;
+                return (dx * dx) + (dz * dz);
+            })
+            .FirstOrDefault();
+
+        if (nearest is not null)
+        {
+            cueDelta = new PhysVector3(nearest.X - cuePlacement.X, 0.0, nearest.Z - cuePlacement.Z);
+        }
+    }
+
+    if (cueDelta.WithY(0.0).Length < 1e-4)
+    {
+        reason = "could not infer cue aim direction";
+        return false;
+    }
+
+    double cueDisplacement = Math.Sqrt((cueDelta.X * cueDelta.X) + (cueDelta.Z * cueDelta.Z));
+    double cueImpulse = Math.Clamp(0.22 + (cueDisplacement * 1.10), 0.20, 1.10);
+
+    scenario = new OnlineFitScenario(
+        clip.ClipId,
+        placements.ToArray(),
+        0,
+        cueDelta.Normalized,
+        cueImpulse,
+        4.0,
+        reference);
+    return true;
+}
+
+static OnlineFitEvaluation EvaluateOnlineFitProfile(IReadOnlyList<OnlineFitScenario> scenarios, PhysicsProfile profile, TableGeometry table)
+{
+    List<OnlineFitClipResult> results = new(scenarios.Count);
+    double totalScore = 0.0;
+    int failed = 0;
+
+    for (int i = 0; i < scenarios.Count; i++)
+    {
+        OnlineFitClipResult clipResult = SimulateOnlineFitScenario(scenarios[i], profile, table);
+        results.Add(clipResult);
+        totalScore += clipResult.Score;
+        if (!clipResult.Success)
+        {
+            failed++;
+        }
+    }
+
+    double meanScore = results.Count == 0 ? double.PositiveInfinity : (totalScore / results.Count);
+    return new OnlineFitEvaluation(meanScore, failed, results.ToArray());
+}
+
+static OnlineFitClipResult SimulateOnlineFitScenario(OnlineFitScenario scenario, PhysicsProfile profile, TableGeometry table)
+{
+    try
+    {
+        BallInitState[] initialStates = BuildInitialStatesFromScenario(scenario, profile, table);
+        if (initialStates.Length == 0)
+        {
+            return OnlineFitClipResult.Fail(scenario.ClipId, "no initial states");
+        }
+
+        BilliardPhysicsEngine engine = new();
+        engine.Initialize(table, profile, initialStates);
+
+        CueShotInput shot = new(
+            scenario.CueBallId,
+            scenario.CueDirection,
+            scenario.CueImpulse,
+            PhysVector2.Zero,
+            0.0,
+            0.525,
+            0.006,
+            18.0);
+
+        if (!engine.CueStrike(shot))
+        {
+            return OnlineFitClipResult.Fail(scenario.ClipId, "cue strike rejected");
+        }
+
+        double simSeconds = 0.0;
+        double dt = 1.0 / Math.Max(120, profile.SimulationHz);
+        SimulationFrame frame = engine.Step(0.0);
+
+        while (simSeconds < scenario.HorizonSeconds)
+        {
+            frame = engine.Step(dt);
+            simSeconds += dt;
+
+            if (!ValidateNumericFrame(frame, out string reason))
+            {
+                return OnlineFitClipResult.Fail(scenario.ClipId, reason);
+            }
+
+            if (frame.IsAtRest && simSeconds > 0.150)
+            {
+                break;
+            }
+        }
+
+        Dictionary<int, BallState> finalById = new(frame.Balls.Length);
+        for (int i = 0; i < frame.Balls.Length; i++)
+        {
+            finalById[frame.Balls[i].Id] = frame.Balls[i];
+        }
+
+        int firstCount = initialStates.Length;
+        int lastCount = frame.Balls.Count(x => x.InPlay && !x.IsPocketed);
+        int pocketedEstimate = Math.Max(0, firstCount - lastCount);
+        int movedEstimate = 0;
+        double cueDisp = -1.0;
+        double maxDisp = 0.0;
+        double moveThreshold = Math.Max(0.005, scenario.ReferenceMetrics.MoveThresholdMeters);
+
+        for (int i = 0; i < initialStates.Length; i++)
+        {
+            BallInitState init = initialStates[i];
+            if (!finalById.TryGetValue(init.Id, out BallState final))
+            {
+                continue;
+            }
+
+            double disp = DistanceXZ(init.Position, final.Position);
+            if (disp > maxDisp)
+            {
+                maxDisp = disp;
+            }
+
+            if (disp >= moveThreshold || final.IsPocketed)
+            {
+                movedEstimate++;
+            }
+
+            if (init.Id == scenario.CueBallId)
+            {
+                cueDisp = disp;
+            }
+        }
+
+        OnlineReferenceMetrics r = scenario.ReferenceMetrics;
+        double cueRef = Math.Max(0.0, r.CueBallDisplacementMeters);
+        double cueErr = cueDisp < 0.0 ? cueRef + 1.0 : Math.Abs(cueDisp - cueRef);
+        double maxErr = Math.Abs(maxDisp - Math.Max(0.0, r.MaxMatchedDisplacementMeters));
+        double movedErr = Math.Abs(movedEstimate - r.EstimatedMovedBallCount);
+        double pocketErr = Math.Abs(pocketedEstimate - r.EstimatedPocketedBallCount);
+        double lastErr = Math.Abs(lastCount - r.LastBallCount);
+        double score =
+            0.45 * (cueErr / 0.20) +
+            0.25 * (maxErr / 0.30) +
+            0.15 * (movedErr / 2.0) +
+            0.10 * (pocketErr / 1.0) +
+            0.05 * (lastErr / 2.0);
+
+        return OnlineFitClipResult.SuccessResult(
+            scenario.ClipId,
+            cueRef,
+            cueDisp,
+            Math.Max(0.0, r.MaxMatchedDisplacementMeters),
+            maxDisp,
+            r.EstimatedMovedBallCount,
+            movedEstimate,
+            r.EstimatedPocketedBallCount,
+            pocketedEstimate,
+            r.LastBallCount,
+            lastCount,
+            cueErr,
+            maxErr,
+            movedErr,
+            pocketErr,
+            lastErr,
+            score);
+    }
+    catch (Exception ex)
+    {
+        return OnlineFitClipResult.Fail(scenario.ClipId, ex.Message);
+    }
+}
+
+static BallInitState[] BuildInitialStatesFromScenario(OnlineFitScenario scenario, PhysicsProfile profile, TableGeometry table)
+{
+    int count = scenario.Placements.Length;
+    if (count == 0)
+    {
+        return Array.Empty<BallInitState>();
+    }
+
+    int[] ids = new int[count];
+    bool[] cueFlags = new bool[count];
+    PhysVector3[] positions = new PhysVector3[count];
+
+    for (int i = 0; i < count; i++)
+    {
+        OnlineFitPlacement p = scenario.Placements[i];
+        ids[i] = p.BallId;
+        cueFlags[i] = p.IsCueBall;
+        PhysVector3 start = new(p.X, table.SurfaceY + profile.BallRadius, p.Z);
+        positions[i] = table.ClampBallCenter(start, profile.BallRadius);
+    }
+
+    double minDist = (profile.BallRadius * 2.0) + 1e-4;
+    for (int iter = 0; iter < 4; iter++)
+    {
+        bool adjusted = false;
+        for (int i = 0; i < count; i++)
+        {
+            for (int j = i + 1; j < count; j++)
+            {
+                PhysVector3 delta = new(positions[j].X - positions[i].X, 0.0, positions[j].Z - positions[i].Z);
+                double dist = delta.Length;
+                if (dist >= minDist)
+                {
+                    continue;
+                }
+
+                PhysVector3 normal = dist > 1e-9
+                    ? (delta / dist)
+                    : new PhysVector3(1.0, 0.0, 0.0);
+                double penetration = minDist - dist;
+                PhysVector3 correction = normal * ((penetration * 0.5) + 1e-4);
+                positions[i] = table.ClampBallCenter(positions[i] - correction, profile.BallRadius);
+                positions[j] = table.ClampBallCenter(positions[j] + correction, profile.BallRadius);
+                adjusted = true;
+            }
+        }
+
+        if (!adjusted)
+        {
+            break;
+        }
+    }
+
+    BallInitState[] states = new BallInitState[count];
+    for (int i = 0; i < count; i++)
+    {
+        states[i] = BallInitState.Create(ids[i], positions[i], profile.BallRadius, profile.BallMass, cueFlags[i]);
+    }
+
+    return states;
+}
+
+static double DistanceXZ(in PhysVector3 a, in PhysVector3 b)
+{
+    double dx = a.X - b.X;
+    double dz = a.Z - b.Z;
+    return Math.Sqrt((dx * dx) + (dz * dz));
+}
+
+static void TrackTopFitTrials(List<OnlineFitTrialSummary> top, OnlineFitTrialSummary summary, int cap)
+{
+    top.Add(summary);
+    top.Sort((a, b) => a.Score.CompareTo(b.Score));
+    if (top.Count > cap)
+    {
+        top.RemoveRange(cap, top.Count - cap);
+    }
+}
+
+static void WriteOnlineCalibrationReport(
+    string packPath,
+    string fitOutputPath,
+    string reportPath,
+    OnlineReferencePack pack,
+    IReadOnlyList<OnlineFitScenario> scenarios,
+    int trials,
+    OnlineFitEvaluation baselineEval,
+    OnlineFitEvaluation bestEval,
+    PhysicsProfile bestProfile,
+    IReadOnlyList<OnlineFitTrialSummary> topTrials)
+{
+    Dictionary<string, OnlineFitClipResult> baselineByClip = baselineEval.ClipResults.ToDictionary(x => x.ClipId, x => x);
+    Dictionary<string, OnlineFitClipResult> bestByClip = bestEval.ClipResults.ToDictionary(x => x.ClipId, x => x);
+    double improvement = baselineEval.Score > 0.0
+        ? ((baselineEval.Score - bestEval.Score) / baselineEval.Score) * 100.0
+        : 0.0;
+
+    StringBuilder md = new();
+    md.AppendLine("# Online Calibration Report");
+    md.AppendLine();
+    md.AppendLine($"- Generated (UTC): `{DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)} UTC`");
+    md.AppendLine($"- Pack path: `{packPath}`");
+    md.AppendLine($"- Source repository: `{pack.Source?.Repository ?? "unknown"}`");
+    md.AppendLine($"- Source commit: `{pack.Source?.RepositoryCommit ?? "unknown"}`");
+    md.AppendLine($"- Source license: `{pack.Source?.DatasetLicense ?? "unknown"}`");
+    md.AppendLine($"- Valid scenarios used: `{scenarios.Count}`");
+    md.AppendLine($"- Search trials: `{trials}`");
+    md.AppendLine($"- Baseline score: `{baselineEval.Score.ToString("F4", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Best score: `{bestEval.Score.ToString("F4", CultureInfo.InvariantCulture)}`");
+    md.AppendLine($"- Score improvement: `{improvement.ToString("F2", CultureInfo.InvariantCulture)}%`");
+    md.AppendLine($"- Fitted profile output: `{fitOutputPath}`");
+    md.AppendLine();
+    md.AppendLine("## Best Coefficients");
+    md.AppendLine();
+    md.AppendLine("| Coefficient | Value |");
+    md.AppendLine("|---|---:|");
+    md.AppendLine($"| `SlidingFriction` | {bestProfile.SlidingFriction.ToString("F4", CultureInfo.InvariantCulture)} |");
+    md.AppendLine($"| `RollingFriction` | {bestProfile.RollingFriction.ToString("F4", CultureInfo.InvariantCulture)} |");
+    md.AppendLine($"| `BallRestitution` | {bestProfile.BallRestitution.ToString("F4", CultureInfo.InvariantCulture)} |");
+    md.AppendLine($"| `RailRestitution` | {bestProfile.RailRestitution.ToString("F4", CultureInfo.InvariantCulture)} |");
+    md.AppendLine($"| `PocketEntryAssist` | {bestProfile.PocketEntryAssist.ToString("F4", CultureInfo.InvariantCulture)} |");
+    md.AppendLine();
+    md.AppendLine("## Top Trials");
+    md.AppendLine();
+    md.AppendLine("| Trial | Score | Failed Clips | Sliding | Rolling | Ball Rest | Rail Rest | Pocket Assist |");
+    md.AppendLine("|---:|---:|---:|---:|---:|---:|---:|---:|");
+    for (int i = 0; i < topTrials.Count; i++)
+    {
+        OnlineFitTrialSummary t = topTrials[i];
+        md.AppendLine(
+            $"| {t.TrialIndex} | {t.Score.ToString("F4", CultureInfo.InvariantCulture)} | {t.FailedClips} | " +
+            $"{t.SlidingFriction.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{t.RollingFriction.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{t.BallRestitution.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{t.RailRestitution.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{t.PocketEntryAssist.ToString("F4", CultureInfo.InvariantCulture)} |");
+    }
+
+    md.AppendLine();
+    md.AppendLine("## Clip Error Delta (Baseline vs Best)");
+    md.AppendLine();
+    md.AppendLine("| Clip | Baseline Score | Best Score | Cue Err Δ (m) | Moved Err Δ | Pocket Err Δ | Last Err Δ |");
+    md.AppendLine("|---|---:|---:|---:|---:|---:|---:|");
+
+    foreach (OnlineFitScenario scenario in scenarios.OrderBy(x => x.ClipId))
+    {
+        if (!baselineByClip.TryGetValue(scenario.ClipId, out OnlineFitClipResult? baselineClip) ||
+            !bestByClip.TryGetValue(scenario.ClipId, out OnlineFitClipResult? bestClip))
+        {
+            continue;
+        }
+
+        double cueDelta = baselineClip.CueErrorMeters - bestClip.CueErrorMeters;
+        double movedDelta = baselineClip.MovedCountError - bestClip.MovedCountError;
+        double pocketDelta = baselineClip.PocketedCountError - bestClip.PocketedCountError;
+        double lastDelta = baselineClip.LastCountError - bestClip.LastCountError;
+
+        md.AppendLine(
+            $"| `{scenario.ClipId}` | {baselineClip.Score.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{bestClip.Score.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{cueDelta.ToString("F4", CultureInfo.InvariantCulture)} | " +
+            $"{movedDelta.ToString("F2", CultureInfo.InvariantCulture)} | " +
+            $"{pocketDelta.ToString("F2", CultureInfo.InvariantCulture)} | " +
+            $"{lastDelta.ToString("F2", CultureInfo.InvariantCulture)} |");
+    }
+
+    md.AppendLine();
+    md.AppendLine("## Notes");
+    md.AppendLine("- Calibration uses coarse first/last frame clip metrics, not full trajectory ground truth.");
+    md.AppendLine("- This fit is a guidance profile for realism direction, not a strict replacement for shot-suite acceptance gates.");
+    md.AppendLine("- Re-run calibration after importing higher-fidelity external references.");
+
+    File.WriteAllText(reportPath, md.ToString());
+}
+
 static PresetValidationSummary EvaluatePresetValidation(ShotFixture[] fixtures, string preset)
 {
     PhysicsProfile profile = new();
@@ -1025,6 +1668,41 @@ static void ApplyProfilePreset(PhysicsProfile profile, string preset)
     }
 
     ApplyProfilePreset(profile, "physics");
+}
+
+static PhysicsProfile CloneProfile(PhysicsProfile src)
+{
+    return new PhysicsProfile
+    {
+        SimulationHz = src.SimulationHz,
+        MaxSubstepsPerFrame = src.MaxSubstepsPerFrame,
+        Gravity = src.Gravity,
+        BallRadius = src.BallRadius,
+        BallMass = src.BallMass,
+        BallRestitution = src.BallRestitution,
+        BallContactFriction = src.BallContactFriction,
+        SlidingFriction = src.SlidingFriction,
+        RollingFriction = src.RollingFriction,
+        SlipToRollThreshold = src.SlipToRollThreshold,
+        SpinDecayRate = src.SpinDecayRate,
+        SideSpinDecayRate = src.SideSpinDecayRate,
+        RailRestitution = src.RailRestitution,
+        RailFriction = src.RailFriction,
+        RailTangentialRetention = src.RailTangentialRetention,
+        RailEnglishInfluence = src.RailEnglishInfluence,
+        RailAxialSpinRetention = src.RailAxialSpinRetention,
+        RailSideSpinInversionRetention = src.RailSideSpinInversionRetention,
+        PocketJawRejectSpeed = src.PocketJawRejectSpeed,
+        PocketEntryAssist = src.PocketEntryAssist,
+        RestLinearThreshold = src.RestLinearThreshold,
+        RestAngularThreshold = src.RestAngularThreshold,
+        RestConfirmSeconds = src.RestConfirmSeconds,
+        MaxCollisionIterationsPerStep = src.MaxCollisionIterationsPerStep,
+        CcdEpsilon = src.CcdEpsilon,
+        PostCollisionPositionIterations = src.PostCollisionPositionIterations,
+        PenetrationSlop = src.PenetrationSlop,
+        PenetrationCorrectionFactor = src.PenetrationCorrectionFactor
+    };
 }
 
 static string NormalizeProfilePreset(string preset)
@@ -1862,6 +2540,38 @@ static string ResolveOnlineReferenceReportPath(string? argPath)
     return Path.Combine(Environment.CurrentDirectory, "ONLINE_REFERENCE_REPORT.md");
 }
 
+static string ResolveOnlineFitOutputPath(string? argPath)
+{
+    if (!string.IsNullOrWhiteSpace(argPath))
+    {
+        return Path.GetFullPath(argPath);
+    }
+
+    string? repoRoot = TryFindRepositoryRoot();
+    if (!string.IsNullOrWhiteSpace(repoRoot))
+    {
+        return Path.Combine(repoRoot, "tests", "ShotSuiteRunner", "fixtures", "physics_profile_online_fit.json");
+    }
+
+    return Path.Combine(Environment.CurrentDirectory, "physics_profile_online_fit.json");
+}
+
+static string ResolveOnlineCalibrationReportPath(string? argPath)
+{
+    if (!string.IsNullOrWhiteSpace(argPath))
+    {
+        return Path.GetFullPath(argPath);
+    }
+
+    string? repoRoot = TryFindRepositoryRoot();
+    if (!string.IsNullOrWhiteSpace(repoRoot))
+    {
+        return Path.Combine(repoRoot, "docs", "ONLINE_CALIBRATION_REPORT.md");
+    }
+
+    return Path.Combine(Environment.CurrentDirectory, "ONLINE_CALIBRATION_REPORT.md");
+}
+
 static string? TryFindRepositoryRoot()
 {
     string[] startPaths = { Environment.CurrentDirectory, AppContext.BaseDirectory };
@@ -2151,12 +2861,230 @@ internal sealed class OnlineReferenceMetrics
     public double MoveThresholdMeters { get; set; }
 }
 
+internal sealed class OnlineFitPlacement
+{
+    public int BallId { get; }
+    public bool IsCueBall { get; }
+    public double X { get; }
+    public double Z { get; }
+
+    public OnlineFitPlacement(int ballId, bool isCueBall, double x, double z)
+    {
+        BallId = ballId;
+        IsCueBall = isCueBall;
+        X = x;
+        Z = z;
+    }
+}
+
+internal sealed class OnlineFitScenario
+{
+    public string ClipId { get; }
+    public OnlineFitPlacement[] Placements { get; }
+    public int CueBallId { get; }
+    public PhysVector3 CueDirection { get; }
+    public double CueImpulse { get; }
+    public double HorizonSeconds { get; }
+    public OnlineReferenceMetrics ReferenceMetrics { get; }
+
+    public OnlineFitScenario(
+        string clipId,
+        OnlineFitPlacement[] placements,
+        int cueBallId,
+        PhysVector3 cueDirection,
+        double cueImpulse,
+        double horizonSeconds,
+        OnlineReferenceMetrics referenceMetrics)
+    {
+        ClipId = clipId;
+        Placements = placements;
+        CueBallId = cueBallId;
+        CueDirection = cueDirection;
+        CueImpulse = cueImpulse;
+        HorizonSeconds = horizonSeconds;
+        ReferenceMetrics = referenceMetrics;
+    }
+}
+
+internal sealed class OnlineFitClipResult
+{
+    public string ClipId { get; }
+    public bool Success { get; }
+    public string Error { get; }
+    public double CueReferenceMeters { get; }
+    public double CueSimMeters { get; }
+    public double MaxReferenceMeters { get; }
+    public double MaxSimMeters { get; }
+    public int MovedReferenceCount { get; }
+    public int MovedSimCount { get; }
+    public int PocketedReferenceCount { get; }
+    public int PocketedSimCount { get; }
+    public int LastReferenceCount { get; }
+    public int LastSimCount { get; }
+    public double CueErrorMeters { get; }
+    public double MaxErrorMeters { get; }
+    public double MovedCountError { get; }
+    public double PocketedCountError { get; }
+    public double LastCountError { get; }
+    public double Score { get; }
+
+    private OnlineFitClipResult(
+        string clipId,
+        bool success,
+        string error,
+        double cueReferenceMeters,
+        double cueSimMeters,
+        double maxReferenceMeters,
+        double maxSimMeters,
+        int movedReferenceCount,
+        int movedSimCount,
+        int pocketedReferenceCount,
+        int pocketedSimCount,
+        int lastReferenceCount,
+        int lastSimCount,
+        double cueErrorMeters,
+        double maxErrorMeters,
+        double movedCountError,
+        double pocketedCountError,
+        double lastCountError,
+        double score)
+    {
+        ClipId = clipId;
+        Success = success;
+        Error = error;
+        CueReferenceMeters = cueReferenceMeters;
+        CueSimMeters = cueSimMeters;
+        MaxReferenceMeters = maxReferenceMeters;
+        MaxSimMeters = maxSimMeters;
+        MovedReferenceCount = movedReferenceCount;
+        MovedSimCount = movedSimCount;
+        PocketedReferenceCount = pocketedReferenceCount;
+        PocketedSimCount = pocketedSimCount;
+        LastReferenceCount = lastReferenceCount;
+        LastSimCount = lastSimCount;
+        CueErrorMeters = cueErrorMeters;
+        MaxErrorMeters = maxErrorMeters;
+        MovedCountError = movedCountError;
+        PocketedCountError = pocketedCountError;
+        LastCountError = lastCountError;
+        Score = score;
+    }
+
+    public static OnlineFitClipResult SuccessResult(
+        string clipId,
+        double cueReferenceMeters,
+        double cueSimMeters,
+        double maxReferenceMeters,
+        double maxSimMeters,
+        int movedReferenceCount,
+        int movedSimCount,
+        int pocketedReferenceCount,
+        int pocketedSimCount,
+        int lastReferenceCount,
+        int lastSimCount,
+        double cueErrorMeters,
+        double maxErrorMeters,
+        double movedCountError,
+        double pocketedCountError,
+        double lastCountError,
+        double score)
+        => new(
+            clipId,
+            true,
+            string.Empty,
+            cueReferenceMeters,
+            cueSimMeters,
+            maxReferenceMeters,
+            maxSimMeters,
+            movedReferenceCount,
+            movedSimCount,
+            pocketedReferenceCount,
+            pocketedSimCount,
+            lastReferenceCount,
+            lastSimCount,
+            cueErrorMeters,
+            maxErrorMeters,
+            movedCountError,
+            pocketedCountError,
+            lastCountError,
+            score);
+
+    public static OnlineFitClipResult Fail(string clipId, string error)
+        => new(
+            clipId,
+            false,
+            error,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            12.0);
+}
+
+internal sealed class OnlineFitEvaluation
+{
+    public double Score { get; }
+    public int FailedClipCount { get; }
+    public OnlineFitClipResult[] ClipResults { get; }
+
+    public OnlineFitEvaluation(double score, int failedClipCount, OnlineFitClipResult[] clipResults)
+    {
+        Score = score;
+        FailedClipCount = failedClipCount;
+        ClipResults = clipResults;
+    }
+}
+
+internal sealed class OnlineFitTrialSummary
+{
+    public int TrialIndex { get; }
+    public double SlidingFriction { get; }
+    public double RollingFriction { get; }
+    public double BallRestitution { get; }
+    public double RailRestitution { get; }
+    public double PocketEntryAssist { get; }
+    public double Score { get; }
+    public int FailedClips { get; }
+
+    public OnlineFitTrialSummary(
+        int trialIndex,
+        double slidingFriction,
+        double rollingFriction,
+        double ballRestitution,
+        double railRestitution,
+        double pocketEntryAssist,
+        double score,
+        int failedClips)
+    {
+        TrialIndex = trialIndex;
+        SlidingFriction = slidingFriction;
+        RollingFriction = rollingFriction;
+        BallRestitution = ballRestitution;
+        RailRestitution = railRestitution;
+        PocketEntryAssist = pocketEntryAssist;
+        Score = score;
+        FailedClips = failedClips;
+    }
+}
+
 internal sealed class RunnerOptions
 {
     public bool RecordMode { get; private set; }
     public bool AnalyzeMode { get; private set; }
     public bool SanityMode { get; private set; }
     public bool ValidationReportMode { get; private set; }
+    public bool OnlineFitMode { get; private set; }
     public bool OnlineReferenceReportMode { get; private set; }
     public int DeterminismRepeats { get; private set; }
     public int StressShots { get; private set; }
@@ -2175,6 +3103,8 @@ internal sealed class RunnerOptions
     public string? ValidationReportPath { get; private set; }
     public string? OnlineReferencePackPath { get; private set; }
     public string? OnlineReferenceReportPath { get; private set; }
+    public string? OnlineFitOutputPath { get; private set; }
+    public string? OnlineCalibrationReportPath { get; private set; }
 
     public static RunnerOptions Parse(string[] args)
     {
@@ -2199,6 +3129,10 @@ internal sealed class RunnerOptions
 
                 case "--validation-report":
                     options.ValidationReportMode = true;
+                    break;
+
+                case "--online-fit":
+                    options.OnlineFitMode = true;
                     break;
 
                 case "--online-reference-report":
@@ -2278,6 +3212,20 @@ internal sealed class RunnerOptions
                     if (i + 1 < args.Length)
                     {
                         options.OnlineReferenceReportPath = args[++i];
+                    }
+                    break;
+
+                case "--online-fit-output":
+                    if (i + 1 < args.Length)
+                    {
+                        options.OnlineFitOutputPath = args[++i];
+                    }
+                    break;
+
+                case "--online-calibration-report-path":
+                    if (i + 1 < args.Length)
+                    {
+                        options.OnlineCalibrationReportPath = args[++i];
                     }
                     break;
 

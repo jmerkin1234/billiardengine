@@ -128,6 +128,22 @@ Default online reference report output:
 - `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_REFERENCE_REPORT.md`
 - source ledger: `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_REFERENCE_SOURCES.md`
 
+Run online profile calibration sweep against imported clip metrics:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --online-fit --online-reference-pack /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/online_reference_pack.json
+```
+
+Default online fit outputs:
+- fitted profile JSON: `/home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/physics_profile_online_fit.json`
+- calibration report: `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_CALIBRATION_REPORT.md`
+
+Optional custom paths:
+
+```bash
+dotnet run --project /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/ShotSuiteRunner.csproj -- --online-fit --online-reference-pack /home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/online_reference_pack.json --online-fit-output /absolute/path/physics_profile_online_fit.json --online-calibration-report-path /absolute/path/ONLINE_CALIBRATION_REPORT.md
+```
+
 Profile presets:
 - `physics` (default): 480Hz, highest fidelity.
 - `balanced`: 360Hz, moderate fallback.
@@ -157,3 +173,4 @@ Notes:
 - Jump/massé/squirt/miscue are intentionally deferred (post-V1 backlog).
 - Baseline fixture is currently tagged `SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE` and not yet marked as real-world reference data.
 - Online pack references are currently coarse first/last frame observations from public clips (not direct fixture pass/fail gates yet).
+- Online fit sweep currently searches `SlidingFriction`, `RollingFriction`, `BallRestitution`, `RailRestitution`, and `PocketEntryAssist` across a 243-trial grid.

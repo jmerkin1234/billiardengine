@@ -25,6 +25,7 @@ Working log for ongoing Codex changes in this repository.
   - added validation report generator with per-preset pass/fail deltas
   - added online-reference ingestion pipeline (`tools/online_reference`)
   - added online-reference runner mode (`--online-reference-report`) and docs output (`docs/ONLINE_REFERENCE_REPORT.md`)
+  - added online-fit calibration mode (`--online-fit`) with fitted profile + calibration report outputs
 - Validation status:
   - `dotnet build` passes
   - `--sanity` passes (head-on transfer, overlap recovery, rail bounce, pocket event emission, shot lifecycle events, prediction isolation)
@@ -35,6 +36,7 @@ Working log for ongoing Codex changes in this repository.
   - `--benchmark-matrix` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/BENCHMARK_MATRIX.md`
   - `--validation-report` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/VALIDATION_REPORT.md`
   - `--online-reference-report` writes `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_REFERENCE_REPORT.md`
+  - `--online-fit` writes `/home/justin/Pictures/billiardengine/engine-rewrite/tests/ShotSuiteRunner/fixtures/physics_profile_online_fit.json` and `/home/justin/Pictures/billiardengine/engine-rewrite/docs/ONLINE_CALIBRATION_REPORT.md`
   - `--require-real-reference` currently fails because fixture metadata is placeholder (`SIMULATED_PLACEHOLDER_NEEDS_REAL_CAPTURE`)
 
 ## Next Work Queue
@@ -57,3 +59,5 @@ Working log for ongoing Codex changes in this repository.
   - added online dataset import script for public 8-ball clip annotations (`build_cv_reference_pack.py`)
   - added fetch+build wrapper (`fetch_and_build_cv_reference_pack.sh`) and generated `tests/ShotSuiteRunner/fixtures/online_reference_pack.json`
   - added online reference summary mode (`--online-reference-report`) and generated `docs/ONLINE_REFERENCE_REPORT.md`
+  - added online profile calibration mode (`--online-fit`) with 243-trial grid search over core coefficients
+  - generated first fitted profile (`tests/ShotSuiteRunner/fixtures/physics_profile_online_fit.json`) and report (`docs/ONLINE_CALIBRATION_REPORT.md`)
